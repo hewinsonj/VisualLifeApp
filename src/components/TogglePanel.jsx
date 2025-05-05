@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 
 export default function TogglePanel() {
@@ -6,6 +6,7 @@ export default function TogglePanel() {
     bloomEnabled,
     glitchEnabled,
     hudVisible,
+    buttonsVisible,
     zoomLevel,
     cameraMode,
     toggleHud,
@@ -19,151 +20,265 @@ export default function TogglePanel() {
     wormholeEnabled,
     toggleFisheye,
     toggleWormhole,
+    colorMode,
+    setColorMode,
+    scrambleEnabled,
+    toggleScramble,
+    pushEnabled,
+    togglePush,
+    pullEnabled,
+    togglePull,
+    invertEnabled,
+    toggleInvert,
+    mirrorModeEnabled,
+    toggleMirrorMode,
+    // Add control functions from store
+    showHud,
+    showButtons,
+    hideButtons,
     // Future: Add more toggle states here as you wire them in
   } = useAppStore();
 
-  const buttonStyle = {
-    margin: "0.2rem",
-    padding: "0.3rem 0.5rem",
-    fontSize: "0.8rem",
+  
+  const [flashButton, setFlashButton] = React.useState(null);
+  const flash = (name) => {
+    setFlashButton(name);
+    setTimeout(() => setFlashButton(null), 300);
   };
 
+  const scrollRef = useRef(null);
+  const containerRef = useRef(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
+
+  const [visible, setVisible] = useState(true);
+  const [shouldRender, setShouldRender] = useState(true);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setShowLeftArrow(el.scrollLeft > 5);
+    setShowRightArrow(el.scrollLeft + el.clientWidth < el.scrollWidth - 5);
+  };
+
+  // Fade toggle logic for panel visibility based on buttonsVisible
+  useEffect(() => {
+    if (buttonsVisible) {
+      setShouldRender(true);
+      setVisible(true);
+    } else {
+      setVisible(false);
+      const timeout = setTimeout(() => setShouldRender(false), 300);
+      return () => clearTimeout(timeout);
+    }
+  }, [buttonsVisible]);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver(handleScroll);
+    observer.observe(el);
+    window.addEventListener("resize", handleScroll);
+
+    // run once on mount
+    handleScroll();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, [buttonsVisible]);
+
+  if (!shouldRender) return null;
+
+  const buttonConfigs = [
+    {
+      label: "View 1",
+      action: () => setCameraMode("orbit"),
+      isActive: () => cameraMode === "orbit",
+    },
+    {
+      label: "View 2",
+      action: () => setCameraMode("zoom"),
+      isActive: () => cameraMode === "zoom",
+    },
+    {
+      label: "View 3",
+      action: () => setCameraMode("top"),
+      isActive: () => cameraMode === "top",
+    },
+    {
+      label: "Time +",
+      action: () => {
+        setTimeSpeed(timeSpeed + 0.5);
+        flash("timePlus");
+      },
+      flashKey: "timePlus",
+    },
+    {
+      label: "Time -",
+      action: () => {
+        setTimeSpeed(Math.max(0.1, timeSpeed - 0.5));
+        flash("timeMinus");
+      },
+      flashKey: "timeMinus",
+    },
+    {
+      label: "Time 1x",
+      action: () => {
+        setTimeSpeed(1);
+        flash("timeReset");
+      },
+      flashKey: "timeReset",
+    },
+    {
+      label: "Glitch",
+      action: () => setGlitch(!glitchEnabled),
+      isActive: () => glitchEnabled,
+    },
+    { label: "Cycle", action: () => flash("cycle"), flashKey: "cycle" },
+    { label: "Fisheye", action: toggleFisheye, isActive: () => fisheyeEnabled },
+    {
+      label: "Wormhole",
+      action: toggleWormhole,
+      isActive: () => wormholeEnabled,
+    },
+    {
+      label: "Bloom",
+      action: () => setBloom(!bloomEnabled),
+      isActive: () => bloomEnabled,
+    },
+    {
+      label: "Red",
+      action: () => setColorMode("red"),
+      isActive: () => colorMode === "red",
+    },
+    {
+      label: "Green",
+      action: () => setColorMode("green"),
+      isActive: () => colorMode === "green",
+    },
+    {
+      label: "Blue",
+      action: () => setColorMode("blue"),
+      isActive: () => colorMode === "blue",
+    },
+    {
+      label: "Purple",
+      action: () => setColorMode("purple"),
+      isActive: () => colorMode === "purple",
+    },
+    {
+      label: "Yellow",
+      action: () => setColorMode("yellow"),
+      isActive: () => colorMode === "yellow",
+    },
+    {
+      label: "White",
+      action: () => setColorMode("white"),
+      isActive: () => colorMode === "white",
+    },
+    {
+      label: "Scramble",
+      action: () => {
+        toggleScramble();
+        flash("scramble");
+      },
+      flashKey: "scramble",
+    },
+    {
+      label: "Push",
+      action: () => {
+        togglePush();
+        flash("push");
+      },
+      flashKey: "push",
+    },
+    {
+      label: "Pull",
+      action: () => {
+        togglePull();
+        flash("pull");
+      },
+      flashKey: "pull",
+    },
+    { label: "Temple", action: () => flash("temple"), flashKey: "temple" },
+    { label: "Invert", action: toggleInvert, isActive: () => invertEnabled },
+    {
+      label: "Contrast",
+      action: () => flash("contrast"),
+      flashKey: "contrast",
+    },
+    {
+      label: "Brightness",
+      action: () => flash("brightness"),
+      flashKey: "brightness",
+    },
+    { label: "Outline", action: () => flash("outline"), flashKey: "outline" },
+    {
+      label: "Randomize Outlines",
+      action: () => flash("randomizeOutline"),
+      flashKey: "randomizeOutline",
+    },
+    {
+      label: "Spread Rays",
+      action: () => flash("spreadRays"),
+      flashKey: "spreadRays",
+    },
+    {
+      label: "Tighten Rays",
+      action: () => flash("tightenRays"),
+      flashKey: "tightenRays",
+    },
+    {
+      label: "Mirror Mode",
+      action: toggleMirrorMode,
+      isActive: () => mirrorModeEnabled,
+    },
+  ];
+
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: 10,
-        left: 10,
-        zIndex: 1000,
-        background: "#111",
-        padding: "1rem",
-        borderRadius: "8px",
-        color: "#fff",
-        maxWidth: "95vw",
-      }}
-    >
-      <h4>HUD Buttons</h4>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.2rem" }}>
-        {/* Views */}
-        <button
-          style={{
-            ...buttonStyle,
-            backgroundColor: cameraMode === "orbit" ? "purple" : undefined,
-          }}
-          onClick={() => setCameraMode("orbit")}
+    <div className={`toggle-panel-container ${visible ? '' : 'fade-out'}`} ref={containerRef}>
+      {" "}
+      {showLeftArrow && <div className="scroll-arrow left">←</div>}
+      <div
+        className="toggle-panel-scroll-wrapper"
+        ref={scrollRef}
+        onScroll={handleScroll}
+      >
+        <div
+          className="toggle-panel-scroll"
         >
-          View 1
-        </button>
-        <button
-          style={{
-            ...buttonStyle,
-            backgroundColor: cameraMode === "zoom" ? "purple" : undefined,
-          }}
-          onClick={() => setCameraMode("zoom")}
-        >
-          View 2
-        </button>
-        <button
-          style={{
-            ...buttonStyle,
-            backgroundColor: cameraMode === "top" ? "purple" : undefined,
-          }}
-          onClick={() => setCameraMode("top")}
-        >
-          View 3
-        </button>
-
-        {/* Time Control */}
-
-        <button
-          style={buttonStyle}
-          onClick={() => setTimeSpeed(timeSpeed + 0.5)}
-        >
-          Time +
-        </button>
-        <button
-          style={buttonStyle}
-          onClick={() => setTimeSpeed(Math.max(0.1, timeSpeed - 0.5))}
-        >
-          Time -
-        </button>
-        <button style={buttonStyle} onClick={() => setTimeSpeed(1)}>
-          Time 1x
-        </button>
-
-        {/* Effects */}
-        <button
-          style={{
-            ...buttonStyle,
-            backgroundColor: glitchEnabled ? "purple" : undefined,
-          }}
-          onClick={() => setGlitch(!glitchEnabled)}
-        >
-          Glitch
-        </button>
-        <button style={buttonStyle}>Cycle</button>
-        <button
-          style={{
-            ...buttonStyle,
-            backgroundColor: fisheyeEnabled ? "purple" : undefined,
-          }}
-          onClick={toggleFisheye}
-        >
-          Fisheye
-        </button>
-        <button
-          style={{
-            ...buttonStyle,
-            backgroundColor: wormholeEnabled ? "purple" : undefined,
-          }}
-          onClick={toggleWormhole}
-        >
-          Wormhole
-        </button>
-        <button
-          style={{
-            ...buttonStyle,
-            backgroundColor: bloomEnabled ? "purple" : undefined,
-          }}
-          onClick={() => setBloom(!bloomEnabled)}
-        >
-          Bloom
-        </button>
-
-        {/* Colors */}
-        <button style={buttonStyle}>Red</button>
-        <button style={buttonStyle}>Green</button>
-        <button style={buttonStyle}>Blue</button>
-        <button style={buttonStyle}>Purple</button>
-        <button style={buttonStyle}>Yellow</button>
-        <button style={buttonStyle}>White</button>
-
-        {/* Warping */}
-
-        <button style={buttonStyle}>Scramble</button>
-        <button style={buttonStyle}>Push</button>
-        <button style={buttonStyle}>Pull</button>
-
-        {/* Scene Modes */}
-        <button style={buttonStyle}>Temple</button>
-
-        {/* Adjustments */}
-        <button style={buttonStyle}>Invert</button>
-        <button style={buttonStyle}>Contrast</button>
-        <button style={buttonStyle}>Brightness</button>
-        <button style={buttonStyle}>Outline</button>
-
-        {/* Rays */}
-        <button style={buttonStyle}>Randomize Outlines</button>
-        <button style={buttonStyle}>Spragd Rays</button>
-        <button style={buttonStyle}>Tighten Rays</button>
-        <button style={buttonStyle}>Mirror Mode</button>
-
-        {/* Show/Hide Controls */}
-        <button style={buttonStyle}>Show HUD</button>
-        <button style={buttonStyle}>Show Buttons</button>
-        <button style={buttonStyle}>Hide Buttons</button>
+          {buttonConfigs.map((btn, idx) => (
+            <button
+              key={idx}
+              className={`toggle-button ${visible ? 'fade-in' : 'fade-out'}`}
+              style={{
+                backgroundColor:
+                  btn.isActive?.() || flashButton === btn.flashKey
+                    ? "purple"
+                    : undefined,
+                flexShrink: 0,
+              }}
+              onClick={btn.action}
+            >
+              {btn.label}
+            </button>
+          ))}
+    {!hudVisible ? (
+            <button className="toggle-button" onClick={showHud}>
+              Show HUD
+            </button>
+          ) : (
+            <button className="toggle-button" onClick={toggleHud}>
+              Hide HUD
+            </button>
+          )}
+        </div>
       </div>
+      {showRightArrow && <div className="scroll-arrow right">→</div>}
+      {" "}
     </div>
   );
 }

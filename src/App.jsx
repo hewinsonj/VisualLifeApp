@@ -1,46 +1,22 @@
-import { useState } from 'react'
-import reactLogo from '/imar.png'
-import viteLogo from '/vite.svg'
-import './App.css'
-
-// function App() {
-//   const [count, setCount] = useState(0)
-
-//   return (
-//     <>
-//       <div>
-//         <a href="https://vite.dev" target="_blank">
-//           <img src={viteLogo} className="logo" alt="Vite logo" />
-//         </a>
-//         <a href="https://react.dev" target="_blank">
-//           <img src={reactLogo} className="logo react" alt="React logo" />
-//         </a>
-//       </div>
-//       <h1>Vite + React</h1>
-//       <div className="card">
-//         <button onClick={() => setCount((count) => count + 1)}>
-//           count is {count}
-//         </button>
-//         <p>
-//           Edit <code>src/App.jsx</code> and save to test HMR
-//         </p>
-//       </div>
-//       <p className="read-the-docs">
-//         Click on the Vite and React logos to learn more
-//       </p>
-//     </>
-//   )
-// }
-
-// export default App
-
-import SampleScene from './canvas/SampleScene.jsx';
-import TogglePanel from './components/TogglePanel.jsx';
+import { useState } from "react";
+import "./App.css";
+import SampleScene from "./canvas/SampleScene.jsx";
+import TogglePanel from "./components/TogglePanel.jsx";
+import HUDInfo from "./components/UI/HUDInfo.jsx";
+import LogoToggleButton from "./components/UI/LogoToggleButton.jsx";
+import { useAppStore } from "./store/useAppStore.js";
 
 function App() {
+  const { hudVisible, buttonsVisible } = useAppStore();
+
   return (
     <div>
-      <TogglePanel />
+      <div className="left-ui-column">
+        <div className="panel-wrapper"><TogglePanel /></div>
+        <div className="logo-wrapper"><LogoToggleButton /></div>
+        <div className="hud-wrapper"><HUDInfo /></div>
+        <div className="logo-wrapperMobile"><LogoToggleButton /></div>
+      </div>
       <SampleScene />
     </div>
   );
