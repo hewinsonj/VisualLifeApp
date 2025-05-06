@@ -1,23 +1,24 @@
-/**
- * Zustand store for managing global UI and shader effects.
- * Includes postprocessing toggles (bloom, glitch) and camera view mode.
- */
 import { create } from "zustand";
 
 export const useAppStore = create((set) => ({
   bloomEnabled: false,
   glitchEnabled: false,
   cameraMode: "default",
-  // Global zoom level for scaling UI/camera
-  zoomLevel: 1,
-  setZoomLevel: (level) => set({ zoomLevel: level }),
 
   // HUD visibility toggle for glyphs, buttons, overlays
   hudVisible: true,
-  toggleHud: () => set((state) => ({ hudVisible: !state })),
+  toggleHud: () => set((state) => ({ hudVisible: !state.hudVisible })),
 
-  timeSpeed: 1,
+  timeSpeed: 0.6,
   setTimeSpeed: (val) => set({ timeSpeed: val }),
+  incrementTimeSpeed: () =>
+    set((state) => ({
+      timeSpeed: Math.min(5.0, state.timeSpeed + 0.05),
+    })),
+  decrementTimeSpeed: () =>
+    set((state) => ({
+      timeSpeed: Math.max(0.1, state.timeSpeed - 0.05),
+    })),
 
   fisheyeEnabled: false,
   toggleFisheye: () => set((s) => ({ fisheyeEnabled: !s.fisheyeEnabled })),
@@ -30,29 +31,106 @@ export const useAppStore = create((set) => ({
   setBloom: (val) => set({ bloomEnabled: val }),
   setGlitch: (val) => set({ glitchEnabled: val }),
   setCameraMode: (mode) => set({ cameraMode: mode }),
-  scrambleEnabled: false,
-  toggleScramble: () => set((s) => ({ scrambleEnabled: !s.scrambleEnabled })),
 
-  pushEnabled: false,
-  togglePush: () => set((s) => ({ pushEnabled: !s.pushEnabled })),
+  // Interaction counters
+  scrambleCount: 0,
+  incrementScramble: () => set((s) => ({ scrambleCount: s.scrambleCount + 1 })),
 
-  pullEnabled: false,
-  togglePull: () => set((s) => ({ pullEnabled: !s.pullEnabled })),
+  pushCount: 0,
+  incrementPush: () => set((s) => ({ pushCount: s.pushCount + 1 })),
+
+  pullCount: 0,
+  incrementPull: () => set((s) => ({ pullCount: s.pullCount + 1 })),
+
+  tightenRaysCount: 0,
+  incrementTightenRays: () =>
+    set((state) => ({ tightenRaysCount: state.tightenRaysCount + 1 })),
+
+  spreadRaysCount: 0,
+  incrementSpreadRays: () =>
+    set((state) => ({ spreadRaysCount: state.spreadRaysCount + 1 })),
+
+  // Changed outlineCount to boolean toggle outlineEnabled
+  outlineEnabled: false,
+  toggleOutline: () =>
+    set((state) => ({ outlineEnabled: !state.outlineEnabled })),
+
+  randomizeOutlinesCount: 0,
+  incrementRandomizeOutline: () =>
+    set((state) => ({
+      randomizeOutlinesCount: state.randomizeOutlinesCount + 1,
+    })),
+
+  // Brightness scale (1 = default). Use for shader/lighting intensity.
+  brightness: 1,
+  incrementBrightness: () =>
+    set((state) => {
+      const step = 0.05;
+      const min = 0.5;
+      const max = 3.0;
+      let direction = state.brightnessDirection ?? 1;
+      let next = state.brightness + step * direction;
+
+      if (next >= max || next <= min) {
+        direction *= -1;
+        next = Math.max(min, Math.min(max, next));
+      }
+
+      return {
+        brightness: next,
+        brightnessDirection: direction,
+      };
+    }),
+
+  templeCount: 0,
+  incrementTemple: () =>
+    set((state) => ({ templeCount: state.templeCount + 1 })),
+
+  cycleCount: 0,
+  incrementCycle: () => set((state) => ({ cycleCount: state.cycleCount + 1 })),
 
   colorMode: "null",
   setColorMode: (mode) => set({ colorMode: mode }),
-  
+
   invertEnabled: false,
   toggleInvert: () => set((s) => ({ invertEnabled: !s.invertEnabled })),
 
   mirrorModeEnabled: false,
-  toggleMirrorMode: () => set((s) => ({ mirrorModeEnabled: !s.mirrorModeEnabled })),
+  toggleMirrorMode: () =>
+    set((s) => ({ mirrorModeEnabled: !s.mirrorModeEnabled })),
 
   buttonsVisible: true,
   showButtons: () => set({ buttonsVisible: true }),
   hideButtons: () => set({ buttonsVisible: false }),
 
-  hudVisible: true,
   showHud: () => set({ hudVisible: true }),
   hideHud: () => set({ hudVisible: false }),
+
+  // Contrast level controls
+  contrastLevel: 0,
+  incrementContrast: () =>
+    set((state) => ({
+      contrastLevel: (state.contrastLevel + 1) % 4,
+    })),
+
+  zoomLevel: 30,
+  incrementZoomLevel: () =>
+    set((state) => ({
+      zoomLevel: Math.min(150, state.zoomLevel + 1.5),
+    })),
+  decrementZoomLevel: () =>
+    set((state) => ({
+      zoomLevel: Math.max(0.5, state.zoomLevel - 1.5),
+    })),
+
+
+      // Global zoom level for scaling UI/camera
+  //
+  incrementZoomValue: () =>
+    set((state) => ({ zoomValue: Math.min(3.0, state.zoomValue + 0.1) })),
+  decrementZoomValue: () =>
+    set((state) => ({ zoomValue: Math.max(0.1, state.zoomValue - 0.1) })),
+  setZoomValue: (val) => set({ zoomValue: val }),
+  resetZoomValue: () => set({ zoomValue: 1, zoomLevel: 1 }),
+  
 }));

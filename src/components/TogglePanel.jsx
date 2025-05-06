@@ -12,10 +12,16 @@ export default function TogglePanel() {
     toggleHud,
     setBloom,
     setGlitch,
-    setZoomLevel,
+    // setZoomLevel, // removed as per instructions
+    incrementZoomLevel,
+    decrementZoomLevel,
+    setZoomValue,
+    resetZoomValue,
     setCameraMode,
     timeSpeed,
     setTimeSpeed,
+    incrementTimeSpeed,
+    decrementTimeSpeed,
     fisheyeEnabled,
     wormholeEnabled,
     toggleFisheye,
@@ -23,11 +29,9 @@ export default function TogglePanel() {
     colorMode,
     setColorMode,
     scrambleEnabled,
-    toggleScramble,
-    pushEnabled,
-    togglePush,
-    pullEnabled,
-    togglePull,
+    incrementScramble,
+    incrementPush,
+    incrementPull,
     invertEnabled,
     toggleInvert,
     mirrorModeEnabled,
@@ -37,9 +41,20 @@ export default function TogglePanel() {
     showButtons,
     hideButtons,
     // Future: Add more toggle states here as you wire them in
+    // incrementOutline,  <-- replaced by toggleOutline
+    // incrementRandomizeOutline,
+    incrementRandomizeOutline,
+    incrementSpreadRays,
+    incrementTightenRays,
+    incrementBrightness,
+    incrementTemple,
+    incrementContrast,
+    contrastLevel,
+    incrementCycle,
+    toggleOutline,
+    outlineEnabled,
   } = useAppStore();
 
-  
   const [flashButton, setFlashButton] = React.useState(null);
   const flash = (name) => {
     setFlashButton(name);
@@ -111,7 +126,7 @@ export default function TogglePanel() {
     {
       label: "Time +",
       action: () => {
-        setTimeSpeed(timeSpeed + 0.5);
+        incrementTimeSpeed();
         flash("timePlus");
       },
       flashKey: "timePlus",
@@ -119,7 +134,7 @@ export default function TogglePanel() {
     {
       label: "Time -",
       action: () => {
-        setTimeSpeed(Math.max(0.1, timeSpeed - 0.5));
+        decrementTimeSpeed();
         flash("timeMinus");
       },
       flashKey: "timeMinus",
@@ -133,11 +148,49 @@ export default function TogglePanel() {
       flashKey: "timeReset",
     },
     {
+      label: "Zoom -",
+      action: () => {
+        incrementZoomLevel();
+        flash("zoomIn");
+      },
+      flashKey: "zoomIn",
+    },
+    {
+      label: "Zoom +",
+      action: () => {
+        decrementZoomLevel();
+        flash("zoomOut");
+      },
+      flashKey: "zoomOut",
+    },
+    {
+      label: "Zoom 1x",
+      action: () => {
+        resetZoomValue();
+        flash("zoomReset");
+      },
+      flashKey: "zoomReset",
+    },
+    {
+      label: "Shader Zoom",
+      action: () => {
+        console.log("Shader Zoom not yet implemented.");
+      },
+      flashKey: "shaderZoom",
+    },
+    {
       label: "Glitch",
       action: () => setGlitch(!glitchEnabled),
       isActive: () => glitchEnabled,
     },
-    { label: "Cycle", action: () => flash("cycle"), flashKey: "cycle" },
+    {
+      label: `Cycle`,
+      action: () => {
+        incrementCycle();
+        flash("cycle");
+      },
+      flashKey: "cycle",
+    },
     { label: "Fisheye", action: toggleFisheye, isActive: () => fisheyeEnabled },
     {
       label: "Wormhole",
@@ -182,7 +235,7 @@ export default function TogglePanel() {
     {
       label: "Scramble",
       action: () => {
-        toggleScramble();
+        incrementScramble();
         flash("scramble");
       },
       flashKey: "scramble",
@@ -190,7 +243,7 @@ export default function TogglePanel() {
     {
       label: "Push",
       action: () => {
-        togglePush();
+        incrementPush();
         flash("push");
       },
       flashKey: "push",
@@ -198,37 +251,67 @@ export default function TogglePanel() {
     {
       label: "Pull",
       action: () => {
-        togglePull();
+        incrementPull();
         flash("pull");
       },
       flashKey: "pull",
     },
-    { label: "Temple", action: () => flash("temple"), flashKey: "temple" },
+    {
+      label: "Temple",
+      action: () => {
+        incrementTemple();
+        flash("temple");
+      },
+      flashKey: "temple",
+    },
     { label: "Invert", action: toggleInvert, isActive: () => invertEnabled },
     {
-      label: "Contrast",
-      action: () => flash("contrast"),
+      label: `Contrast`,
+      action: () => {
+        incrementContrast();
+        flash("contrast");
+      },
       flashKey: "contrast",
     },
     {
       label: "Brightness",
-      action: () => flash("brightness"),
+      action: () => {
+        incrementBrightness();
+        flash("brightness");
+      },
       flashKey: "brightness",
     },
-    { label: "Outline", action: () => flash("outline"), flashKey: "outline" },
+    {
+      label: "Outline",
+      action: () => {
+        toggleOutline();
+        flash("outline");
+      },
+      isActive: () => outlineEnabled,
+      flashKey: "outline",
+    },
     {
       label: "Randomize Outlines",
-      action: () => flash("randomizeOutline"),
+      action: () => {
+        incrementRandomizeOutline();
+        flash("randomizeOutline");
+      },
       flashKey: "randomizeOutline",
     },
     {
       label: "Spread Rays",
-      action: () => flash("spreadRays"),
+      action: () => {
+        incrementSpreadRays();
+        flash("spreadRays");
+      },
       flashKey: "spreadRays",
     },
     {
       label: "Tighten Rays",
-      action: () => flash("tightenRays"),
+      action: () => {
+        incrementTightenRays();
+        flash("tightenRays");
+      },
       flashKey: "tightenRays",
     },
     {
@@ -239,7 +322,10 @@ export default function TogglePanel() {
   ];
 
   return (
-    <div className={`toggle-panel-container ${visible ? '' : 'fade-out'}`} ref={containerRef}>
+    <div
+      className={`toggle-panel-container ${visible ? "" : "fade-out"}`}
+      ref={containerRef}
+    >
       {" "}
       {showLeftArrow && <div className="scroll-arrow left">←</div>}
       <div
@@ -247,13 +333,11 @@ export default function TogglePanel() {
         ref={scrollRef}
         onScroll={handleScroll}
       >
-        <div
-          className="toggle-panel-scroll"
-        >
+        <div className="toggle-panel-scroll">
           {buttonConfigs.map((btn, idx) => (
             <button
               key={idx}
-              className={`toggle-button ${visible ? 'fade-in' : 'fade-out'}`}
+              className={`toggle-button ${visible ? "fade-in" : "fade-out"}`}
               style={{
                 backgroundColor:
                   btn.isActive?.() || flashButton === btn.flashKey
@@ -266,7 +350,7 @@ export default function TogglePanel() {
               {btn.label}
             </button>
           ))}
-    {!hudVisible ? (
+          {!hudVisible ? (
             <button className="toggle-button" onClick={showHud}>
               Show HUD
             </button>
@@ -277,8 +361,7 @@ export default function TogglePanel() {
           )}
         </div>
       </div>
-      {showRightArrow && <div className="scroll-arrow right">→</div>}
-      {" "}
+      {showRightArrow && <div className="scroll-arrow right">→</div>}{" "}
     </div>
   );
 }

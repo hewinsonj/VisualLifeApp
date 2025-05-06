@@ -43,7 +43,7 @@ if (!shouldRender) return null;
       • [L]: Pull Shapes<br />
       • [Z]: Regenerate Temple<br />
       • [C]: Adjust Contrast<br />
-      • [D]: Adjust Brightness<br />
+      • [B]: Adjust Brightness<br />
       • [N]: Invert Colors<br />
       • [R/H/B/P/Y/W]: Color Palettes<br />
       • [X]: Cycle Random Palette<br />
