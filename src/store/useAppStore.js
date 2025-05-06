@@ -124,13 +124,24 @@ export const useAppStore = create((set) => ({
     })),
 
 
-      // Global zoom level for scaling UI/camera
-  //
-  // incrementZoomValue: () =>
-  //   set((state) => ({ zoomValue: Math.min(3.0, state.zoomValue + 0.1) })),
-  // decrementZoomValue: () =>
-  //   set((state) => ({ zoomValue: Math.max(0.1, state.zoomValue - 0.1) })),
-  // setZoomValue: (val) => set({ zoomValue: val }),
-  // resetZoomValue: () => set({ zoomValue: 1, zoomLevel: 1 }),
+  setZoomLevel: (val) => set({ zoomLevel: val }),
+  resetZoomLevel: () => set({ zoomLevel: 1, zoomLevel: 1 }),
+
+  cameraRotation: { x: 0, y: 0 },
+  targetCameraRotation: { x: 0, y: 0 },
+  setCameraRotation: (rotation) => set({ targetCameraRotation: rotation }),
+  updateCameraRotation: () =>
+    set((state) => {
+      const lerp = (start, end, factor) => start + (end - start) * factor;
+      return {
+        cameraRotation: {
+          x: lerp(state.cameraRotation.x, state.targetCameraRotation.x, 0.04),
+          y: lerp(state.cameraRotation.y, state.targetCameraRotation.y, 0.04),
+        },
+      };
+    }),
+
+  cameraOffset: { x: 0, y: 0 },
+  setCameraOffset: (offset) => set({ cameraOffset: offset }),
   
 }));

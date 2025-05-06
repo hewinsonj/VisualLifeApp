@@ -1,3 +1,30 @@
+/* DebugPanel styles */
+.debug-panel {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 12px;
+  z-index: 1000;
+  border-radius: 8px;
+  max-width: 300px;
+  overflow: auto;
+  user-select: none;
+  touch-action: manipulation;
+  outline: none;
+  box-shadow: none;
+}
+
+.debug-panel h4 {
+  margin: 0 0 10px 0;
+}
+
+.debug-panel pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
 .toggle-panel-scroll-wrapper {
   position: relative;
   width: 100vw;
@@ -143,6 +170,12 @@
   margin-left: 10px;
   animation: fadeIn 0.3s ease-out forwards;
   opacity: 0;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  outline: none;
+  box-shadow: none;
 }
 
 .hud-info-header {
@@ -245,7 +278,7 @@
     overflow: visible;
     position: relative;
     z-index: 1000;
-    background: #000;
+    /* background: #000; */
     min-height: 6rem;
     flex-shrink: 0;
     flex-grow: 0;
@@ -378,8 +411,11 @@
   }
 .canvas,
 canvas {
-  touch-action: auto !important;
-  pointer-events: none;
+  touch-action: none !important;
+  -ms-touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: auto;
 }
 
 @keyframes fadeIn {

@@ -12,11 +12,10 @@ export default function TogglePanel() {
     toggleHud,
     setBloom,
     setGlitch,
-    // setZoomLevel, // removed as per instructions
     incrementZoomLevel,
     decrementZoomLevel,
-    setZoomValue,
-    resetZoomValue,
+    setZoomLevel,
+    resetZoomLevel,
     setCameraMode,
     timeSpeed,
     setTimeSpeed,
@@ -166,7 +165,7 @@ export default function TogglePanel() {
     {
       label: "Zoom 1x",
       action: () => {
-        resetZoomValue();
+        resetZoomLevel();
         flash("zoomReset");
       },
       flashKey: "zoomReset",
@@ -328,6 +327,19 @@ export default function TogglePanel() {
     >
       {" "}
       {showLeftArrow && <div className="scroll-arrow left">←</div>}
+      {buttonsVisible && (
+        <div
+          className="scroll-guard-zone block-zoom"
+          onWheel={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          onTouchMove={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+        />
+      )}
       <div
         className="toggle-panel-scroll-wrapper"
         ref={scrollRef}

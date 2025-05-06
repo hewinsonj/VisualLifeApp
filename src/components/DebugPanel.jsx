@@ -66,20 +66,8 @@ const DebugPanel = () => {
   if (!visible) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      bottom: 10,
-      right: 10,
-      padding: '12px',
-      background: 'rgba(0,0,0,0.8)',
-      color: 'white',
-      fontSize: '12px',
-      zIndex: 1000,
-      borderRadius: '8px',
-      maxWidth: '300px',
-      overflow: 'auto',
-    }}>
-      <h4 style={{ margin: '0 0 10px 0' }}>🛠 Debug Panel</h4>
+    <div className="debug-panel">
+      <h4>🛠 Debug Panel</h4>
       {/* <div>View Mode: <strong>{viewMode}</strong></div> */}
       {/* <div>Zoom: <strong>{zoomLevel}</strong></div> */}
       {/* <div>Device: <strong>{isMobile ? 'Mobile' : 'Desktop'}</strong></div> */}
@@ -105,7 +93,7 @@ const DebugPanel = () => {
       <div>Debug HUD Visible: {debugHudVisible ? 'Yes' : 'No'}</div>
       <hr /> */}
       {/* <div><strong>Zustand Snapshot:</strong></div> */}
-      <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+      <pre>
         {JSON.stringify(appState, null, 2)}
       </pre>
     </div>
