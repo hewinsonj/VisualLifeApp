@@ -116,21 +116,21 @@ export const useAppStore = create((set) => ({
   zoomLevel: 30,
   incrementZoomLevel: () =>
     set((state) => ({
-      zoomLevel: Math.min(150, state.zoomLevel + 1.5),
+      zoomLevel: Math.min(150, state.zoomLevel + .7),
     })),
   decrementZoomLevel: () =>
     set((state) => ({
-      zoomLevel: Math.max(0.5, state.zoomLevel - 1.5),
+      zoomLevel: Math.max(0.5, state.zoomLevel - .7),
     })),
 
 
       // Global zoom level for scaling UI/camera
   //
-  incrementZoomValue: () =>
-    set((state) => ({ zoomValue: Math.min(3.0, state.zoomValue + 0.1) })),
-  decrementZoomValue: () =>
-    set((state) => ({ zoomValue: Math.max(0.1, state.zoomValue - 0.1) })),
-  setZoomValue: (val) => set({ zoomValue: val }),
-  resetZoomValue: () => set({ zoomValue: 1, zoomLevel: 1 }),
+  // incrementZoomValue: () =>
+  //   set((state) => ({ zoomValue: Math.min(3.0, state.zoomValue + 0.1) })),
+  // decrementZoomValue: () =>
+  //   set((state) => ({ zoomValue: Math.max(0.1, state.zoomValue - 0.1) })),
+  // setZoomValue: (val) => set({ zoomValue: val }),
+  // resetZoomValue: () => set({ zoomValue: 1, zoomLevel: 1 }),
   
 }));

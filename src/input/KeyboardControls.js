@@ -9,8 +9,8 @@ export default function KeyboardControls() {
     incrementTimeSpeed,
     decrementTimeSpeed,
     resetTimeSpeed,
-    incrementZoomValue,
-    decrementZoomValue,
+    incrementZoomLevel,
+    decrementZoomLevel,
     toggleFisheye,
     toggleWormhole,
     incrementScramble,
@@ -28,7 +28,7 @@ export default function KeyboardControls() {
     incrementTightenRays,
     toggleChoppySpeed,
     toggleMirror,
-    toggleDebugger,
+    // toggleDebugger,
   } = useAppStore();
 
   useEffect(() => {
@@ -40,8 +40,8 @@ export default function KeyboardControls() {
         case '+': incrementTimeSpeed(); break;
         case '-': decrementTimeSpeed(); break;
         case '0': resetTimeSpeed(); break;
-        case '[': decrementZoomValue(); break;
-        case ']': incrementZoomValue(); break;
+        case '[': decrementZoomLevel(); break;
+        case ']': incrementZoomLevel(); break;
         case 'f': toggleFisheye(); break;
         case 'v': toggleWormhole(); break;
         case 'e': incrementScramble(); break;
@@ -59,7 +59,7 @@ export default function KeyboardControls() {
         case 't': incrementTightenRays(); break;
         case 'u': toggleChoppySpeed(); break;
         case 'm': toggleMirror(); break;
-        case 'd': toggleDebugger(); break;
+        // case 'd': toggleDebugger(); break;
         default: break;
       }
     };
@@ -69,7 +69,7 @@ export default function KeyboardControls() {
   }, [
     toggleViewMode1, toggleViewMode2, toggleViewMode3,
     incrementTimeSpeed, decrementTimeSpeed, resetTimeSpeed,
-    incrementZoomValue, decrementZoomValue,
+    incrementZoomLevel, decrementZoomLevel,
     toggleFisheye, toggleWormhole,
     incrementScramble, incrementPush, incrementPull,
     regenerateTemple,
@@ -78,7 +78,7 @@ export default function KeyboardControls() {
     incrementRandomizeOutline, toggleWireframe,
     incrementSpreadRays, incrementTightenRays,
     toggleChoppySpeed, toggleMirror,
-    toggleDebugger
+    // toggleDebugger
   ]);
 
   return null;

@@ -1,6 +1,8 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import ZoomController from '../systems/ZoomController';
+import KeyboardControls from '../input/KeyboardControls';
+import MouseControls from '../input/MouseControls';
 
 function SceneContents() {
   const cubeRef = useRef();
@@ -15,6 +17,9 @@ function SceneContents() {
   return (
     <>
       <ZoomController />
+      <KeyboardControls />
+      <MouseControls />
+      
       <mesh ref={cubeRef}>
         <boxGeometry />
         <meshStandardMaterial color="lime" />
