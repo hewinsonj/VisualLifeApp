@@ -1,5 +1,6 @@
+import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ZoomController from '../systems/ZoomController';
 import KeyboardControls from '../input/KeyboardControls';
 import MouseControls from '../input/MouseControls';
@@ -14,6 +15,7 @@ function SceneContents() {
   const freeView = useAppStore((state) => state.freeView);
   const prevMouse = useRef({ x: 0, y: 0 });
   const { camera } = useThree();
+  const [needsPivotSync, setNeedsPivotSync] = useState(false);
 
   useFrame(() => {
     updateCameraRotation();
@@ -25,6 +27,12 @@ function SceneContents() {
       camera.rotation.y = cameraRotation.y;
       camera.rotation.z = cameraRotation.z ?? 0;
     } else if (cameraPivotRef.current) {
+      const { cameraRotation, pivotPosition } = useAppStore.getState();
+      cameraPivotRef.current.position.set(
+        pivotPosition.x,
+        pivotPosition.y,
+        pivotPosition.z
+      );
       cameraPivotRef.current.rotation.x = cameraRotation.x;
       cameraPivotRef.current.rotation.y = cameraRotation.y;
       cameraPivotRef.current.rotation.z = cameraRotation.z ?? 0;

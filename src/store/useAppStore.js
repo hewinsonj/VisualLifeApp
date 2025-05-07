@@ -149,16 +149,23 @@ export const useAppStore = create((set) => ({
   updateCameraRotation: () =>
     set((state) => {
       const lerp = (start, end, factor) => start + (end - start) * factor;
+      const threshold = 0.00001;
+
+      const snap = (a, b) => Math.abs(a - b) < threshold ? b : lerp(a, b, 0.04);
+
       return {
         cameraRotation: {
-          x: lerp(state.cameraRotation.x, state.targetCameraRotation.x, 0.04),
-          y: lerp(state.cameraRotation.y, state.targetCameraRotation.y, 0.04),
-          z: lerp(state.cameraRotation.z ?? 0, state.targetCameraRotation.z ?? 0, 0.04),
+          x: snap(state.cameraRotation.x, state.targetCameraRotation.x),
+          y: snap(state.cameraRotation.y, state.targetCameraRotation.y),
+          z: snap(state.cameraRotation.z ?? 0, state.targetCameraRotation.z ?? 0),
         },
       };
     }),
 
   cameraOffset: { x: 0, y: 0 },
   setCameraOffset: (offset) => set({ cameraOffset: offset }),
-  
+
+  // Pivot group position for camera transitions
+  pivotPosition: { x: 0, y: 0, z: 0 },
+  setPivotPosition: (pos) => set({ pivotPosition: pos }),
 }));

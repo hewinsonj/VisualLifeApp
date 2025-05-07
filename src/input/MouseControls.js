@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import * as THREE from 'three';
 import { useAppStore } from '../store/useAppStore';
 import { useThree } from '@react-three/fiber';
 
@@ -52,16 +53,25 @@ function MouseControls() {
       dragButton.current = null;
 
       if (useAppStore.getState().freeView) {
+        const worldQuat = camera.getWorldQuaternion(new THREE.Quaternion());
+        const worldEuler = new THREE.Euler().setFromQuaternion(worldQuat);
+        const worldPos = camera.getWorldPosition(new THREE.Vector3());
+
         useAppStore.setState({
           cameraRotation: {
-            x: camera.rotation.x,
-            y: camera.rotation.y,
-            z: camera.rotation.z ?? 0,
+            x: worldEuler.x,
+            y: worldEuler.y,
+            z: worldEuler.z,
           },
           targetCameraRotation: {
-            x: camera.rotation.x,
-            y: camera.rotation.y,
-            z: camera.rotation.z ?? 0,
+            x: worldEuler.x,
+            y: worldEuler.y,
+            z: worldEuler.z,
+          },
+          pivotPosition: {
+            x: worldPos.x,
+            y: worldPos.y,
+            z: worldPos.z,
           },
         });
       }
