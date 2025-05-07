@@ -18,14 +18,17 @@ function SceneContents() {
   useFrame(() => {
     updateCameraRotation();
     updateZoomLevel();
-    const { cameraRotation } = useAppStore.getState();
+    const { cameraRotation, freeView } = useAppStore.getState();
 
     if (freeView) {
       camera.rotation.x = cameraRotation.x;
       camera.rotation.y = cameraRotation.y;
+      camera.rotation.z = cameraRotation.z ?? 0;
     } else if (cameraPivotRef.current) {
       cameraPivotRef.current.rotation.x = cameraRotation.x;
       cameraPivotRef.current.rotation.y = cameraRotation.y;
+      cameraPivotRef.current.rotation.z = cameraRotation.z ?? 0;
+      camera.rotation.set(0, 0, 0);
     }
 
     camera.position.z = zoomLevel;

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useAppStore } from '../store/useAppStore';
+import { useThree } from '@react-three/fiber';
 
 function MouseControls() {
   const setZoomTarget = useAppStore((state) => state.setZoomTarget);
@@ -9,6 +10,8 @@ function MouseControls() {
   const cameraOffset = useAppStore((state) => state.cameraOffset);
   const setCameraOffset = useAppStore((state) => state.setCameraOffset);
   const setFreeView = useAppStore((state) => state.setFreeView);
+
+  const { camera } = useThree();
 
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0 });
@@ -28,22 +31,18 @@ function MouseControls() {
       dragStart.current = { x: event.clientX, y: event.clientY };
       dragButton.current = event.button;
       if (event.shiftKey && event.button === 0) {
-        // Sync current camera rotation into the store before enabling free view
-        const camera = document.querySelector('canvas')?.__r3f?.fiber?.getState()?.camera;
-        if (camera) {
-          useAppStore.setState({
-            cameraRotation: {
-              x: camera.rotation.x,
-              y: camera.rotation.y,
-              z: camera.rotation.z ?? 0,
-            },
-            targetCameraRotation: {
-              x: camera.rotation.x,
-              y: camera.rotation.y,
-              z: camera.rotation.z ?? 0,
-            },
-          });
-        }
+        useAppStore.setState({
+          cameraRotation: {
+            x: camera.rotation.x,
+            y: camera.rotation.y,
+            z: camera.rotation.z ?? 0,
+          },
+          targetCameraRotation: {
+            x: camera.rotation.x,
+            y: camera.rotation.y,
+            z: camera.rotation.z ?? 0,
+          },
+        });
         setFreeView(true);
       }
     };
@@ -53,21 +52,18 @@ function MouseControls() {
       dragButton.current = null;
 
       if (useAppStore.getState().freeView) {
-        const camera = document.querySelector('canvas')?.__r3f?.fiber?.getState()?.camera;
-        if (camera) {
-          useAppStore.setState({
-            cameraRotation: {
-              x: camera.rotation.x,
-              y: camera.rotation.y,
-              z: camera.rotation.z ?? 0,
-            },
-            targetCameraRotation: {
-              x: camera.rotation.x,
-              y: camera.rotation.y,
-              z: camera.rotation.z ?? 0,
-            },
-          });
-        }
+        useAppStore.setState({
+          cameraRotation: {
+            x: camera.rotation.x,
+            y: camera.rotation.y,
+            z: camera.rotation.z ?? 0,
+          },
+          targetCameraRotation: {
+            x: camera.rotation.x,
+            y: camera.rotation.y,
+            z: camera.rotation.z ?? 0,
+          },
+        });
       }
 
       setFreeView(false);
@@ -160,6 +156,7 @@ function MouseControls() {
     cameraOffset,
     setCameraOffset,
     setFreeView,
+    camera,
   ]);
 
   return null;
