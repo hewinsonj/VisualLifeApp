@@ -114,6 +114,15 @@ export const useAppStore = create((set) => ({
     })),
 
   zoomLevel: 30,
+  zoomTarget: 30,
+  setZoomTarget: (val) => set({ zoomTarget: val }),
+  updateZoomLevel: () =>
+    set((state) => {
+      const lerp = (a, b, t) => a + (b - a) * t;
+      return {
+        zoomLevel: lerp(state.zoomLevel, state.zoomTarget, 0.08),
+      };
+    }),
   incrementZoomLevel: () =>
     set((state) => ({
       zoomLevel: Math.min(150, state.zoomLevel + .7),
@@ -123,12 +132,19 @@ export const useAppStore = create((set) => ({
       zoomLevel: Math.max(0.5, state.zoomLevel - .7),
     })),
 
-
   setZoomLevel: (val) => set({ zoomLevel: val }),
-  resetZoomLevel: () => set({ zoomLevel: 1, zoomLevel: 1 }),
+  resetZoomLevel: () => set({
+    zoomTarget: 1,
+    cameraRotation: { x: 0, y: 0, z: 0 },
+    targetCameraRotation: { x: 0, y: 0, z: 0 },
+    cameraOffset: { x: 0, y: 0 },
+  }),
 
-  cameraRotation: { x: 0, y: 0 },
-  targetCameraRotation: { x: 0, y: 0 },
+  freeView: false,
+  setFreeView: (val) => set({ freeView: val }),
+
+  cameraRotation: { x: 0, y: 0, z: 0 },
+  targetCameraRotation: { x: 0, y: 0, z: 0 },
   setCameraRotation: (rotation) => set({ targetCameraRotation: rotation }),
   updateCameraRotation: () =>
     set((state) => {
@@ -137,6 +153,7 @@ export const useAppStore = create((set) => ({
         cameraRotation: {
           x: lerp(state.cameraRotation.x, state.targetCameraRotation.x, 0.04),
           y: lerp(state.cameraRotation.y, state.targetCameraRotation.y, 0.04),
+          z: lerp(state.cameraRotation.z ?? 0, state.targetCameraRotation.z ?? 0, 0.04),
         },
       };
     }),

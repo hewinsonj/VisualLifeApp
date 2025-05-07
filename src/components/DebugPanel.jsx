@@ -94,8 +94,23 @@ const DebugPanel = () => {
       <hr /> */}
       {/* <div><strong>Zustand Snapshot:</strong></div> */}
       <pre>
-        {JSON.stringify(appState, null, 2)}
-      </pre>
+      <pre>
+  {JSON.stringify({
+    ...appState,
+    zoomLevel: appState.zoomLevel?.toFixed?.(2),
+    zoomTarget: appState.zoomTarget?.toFixed?.(2),
+    cameraRotation: {
+      x: appState.cameraRotation?.x?.toFixed?.(2),
+      y: appState.cameraRotation?.y?.toFixed?.(2),
+      z: appState.cameraRotation?.z?.toFixed?.(2),
+    },
+    targetCameraRotation: {
+      x: appState.targetCameraRotation?.x?.toFixed?.(2),
+      y: appState.targetCameraRotation?.y?.toFixed?.(2),
+      z: appState.targetCameraRotation?.z?.toFixed?.(2),
+    },
+  }, null, 2)}
+</pre>      </pre>
     </div>
   );
 };

@@ -80,3 +80,12 @@ button:focus-visible {
     display: none;
   }
 }
+
+html, body, canvas {
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
+  -ms-touch-action: none;
+  -webkit-touch-callout: none;
+  overscroll-behavior: none;
+}

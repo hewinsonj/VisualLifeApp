@@ -12,8 +12,8 @@ export default function TogglePanel() {
     toggleHud,
     setBloom,
     setGlitch,
-    incrementZoomLevel,
-    decrementZoomLevel,
+    zoomTarget,
+    setZoomTarget,
     setZoomLevel,
     resetZoomLevel,
     setCameraMode,
@@ -149,7 +149,7 @@ export default function TogglePanel() {
     {
       label: "Zoom -",
       action: () => {
-        incrementZoomLevel();
+        setZoomTarget(Math.max(0.5, zoomTarget - 1.5));
         flash("zoomIn");
       },
       flashKey: "zoomIn",
@@ -157,7 +157,7 @@ export default function TogglePanel() {
     {
       label: "Zoom +",
       action: () => {
-        decrementZoomLevel();
+        setZoomTarget(Math.min(150, zoomTarget + 1.5));
         flash("zoomOut");
       },
       flashKey: "zoomOut",

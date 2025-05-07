@@ -2,12 +2,13 @@ import { useEffect, useRef } from 'react';
 import { useAppStore } from '../store/useAppStore';
 
 function MouseControls() {
-  const incrementZoomLevel = useAppStore((state) => state.incrementZoomLevel);
-  const decrementZoomLevel = useAppStore((state) => state.decrementZoomLevel);
+  const setZoomTarget = useAppStore((state) => state.setZoomTarget);
+  const zoomTarget = useAppStore((state) => state.zoomTarget);
   const targetCameraRotation = useAppStore((state) => state.targetCameraRotation);
   const setCameraRotation = useAppStore((state) => state.setCameraRotation);
   const cameraOffset = useAppStore((state) => state.cameraOffset);
   const setCameraOffset = useAppStore((state) => state.setCameraOffset);
+  const setFreeView = useAppStore((state) => state.setFreeView);
 
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0 });
@@ -16,9 +17,9 @@ function MouseControls() {
   useEffect(() => {
     const handleWheel = (event) => {
       if (event.deltaY > 0) {
-        decrementZoomLevel();
+        setZoomTarget(Math.min(150, zoomTarget + 1.5));
       } else {
-        incrementZoomLevel();
+        setZoomTarget(Math.max(0.5, zoomTarget - 1.5));
       }
     };
 
@@ -26,11 +27,50 @@ function MouseControls() {
       isDragging.current = true;
       dragStart.current = { x: event.clientX, y: event.clientY };
       dragButton.current = event.button;
+      if (event.shiftKey && event.button === 0) {
+        // Sync current camera rotation into the store before enabling free view
+        const camera = document.querySelector('canvas')?.__r3f?.fiber?.getState()?.camera;
+        if (camera) {
+          useAppStore.setState({
+            cameraRotation: {
+              x: camera.rotation.x,
+              y: camera.rotation.y,
+              z: camera.rotation.z ?? 0,
+            },
+            targetCameraRotation: {
+              x: camera.rotation.x,
+              y: camera.rotation.y,
+              z: camera.rotation.z ?? 0,
+            },
+          });
+        }
+        setFreeView(true);
+      }
     };
 
     const handleMouseUp = () => {
       isDragging.current = false;
       dragButton.current = null;
+
+      if (useAppStore.getState().freeView) {
+        const camera = document.querySelector('canvas')?.__r3f?.fiber?.getState()?.camera;
+        if (camera) {
+          useAppStore.setState({
+            cameraRotation: {
+              x: camera.rotation.x,
+              y: camera.rotation.y,
+              z: camera.rotation.z ?? 0,
+            },
+            targetCameraRotation: {
+              x: camera.rotation.x,
+              y: camera.rotation.y,
+              z: camera.rotation.z ?? 0,
+            },
+          });
+        }
+      }
+
+      setFreeView(false);
     };
 
     const handleMouseMove = (event) => {
@@ -113,12 +153,13 @@ function MouseControls() {
       window.removeEventListener('touchend', handleTouchEnd);
     };
   }, [
-    incrementZoomLevel,
-    decrementZoomLevel,
+    setZoomTarget,
+    zoomTarget,
     targetCameraRotation,
     setCameraRotation,
     cameraOffset,
     setCameraOffset,
+    setFreeView,
   ]);
 
   return null;

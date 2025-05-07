@@ -9,8 +9,8 @@ export default function KeyboardControls() {
     incrementTimeSpeed,
     decrementTimeSpeed,
     resetTimeSpeed,
-    incrementZoomLevel,
-    decrementZoomLevel,
+    zoomTarget,
+    setZoomTarget,
     toggleFisheye,
     toggleWormhole,
     incrementScramble,
@@ -29,6 +29,7 @@ export default function KeyboardControls() {
     toggleChoppySpeed,
     toggleMirror,
     // toggleDebugger,
+    resetZoomLevel,
   } = useAppStore();
 
   useEffect(() => {
@@ -40,8 +41,8 @@ export default function KeyboardControls() {
         case '+': incrementTimeSpeed(); break;
         case '-': decrementTimeSpeed(); break;
         case '0': resetTimeSpeed(); break;
-        case '[': decrementZoomLevel(); break;
-        case ']': incrementZoomLevel(); break;
+        case '[': setZoomTarget(Math.max(0.5, zoomTarget - 1.5)); break;
+        case ']': setZoomTarget(Math.min(150, zoomTarget + 1.5)); break;
         case 'f': toggleFisheye(); break;
         case 'v': toggleWormhole(); break;
         case 'e': incrementScramble(); break;
@@ -59,6 +60,7 @@ export default function KeyboardControls() {
         case 't': incrementTightenRays(); break;
         case 'u': toggleChoppySpeed(); break;
         case 'm': toggleMirror(); break;
+        case '\\': resetZoomLevel(); break;
         // case 'd': toggleDebugger(); break;
         default: break;
       }
@@ -69,7 +71,7 @@ export default function KeyboardControls() {
   }, [
     toggleViewMode1, toggleViewMode2, toggleViewMode3,
     incrementTimeSpeed, decrementTimeSpeed, resetTimeSpeed,
-    incrementZoomLevel, decrementZoomLevel,
+    zoomTarget, setZoomTarget,
     toggleFisheye, toggleWormhole,
     incrementScramble, incrementPush, incrementPull,
     regenerateTemple,
@@ -78,7 +80,8 @@ export default function KeyboardControls() {
     incrementRandomizeOutline, toggleWireframe,
     incrementSpreadRays, incrementTightenRays,
     toggleChoppySpeed, toggleMirror,
-    // toggleDebugger
+    // toggleDebugger,
+    resetZoomLevel,
   ]);
 
   return null;

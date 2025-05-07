@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import SampleScene from "./canvas/SampleScene.jsx";
 import TogglePanel from "./components/TogglePanel.jsx";
@@ -9,6 +9,28 @@ import useDetectDeviceProfile from "./hooks/useDetectDeviceProfile";
 import { useAppStore } from "./store/useAppStore.js";
 
 function App() {
+  useEffect(() => {
+    const preventZoom = (e) => {
+      if (e.ctrlKey || e.metaKey || e.touches?.length > 1) {
+        e.preventDefault();
+      }
+    };
+
+    const preventGesture = (e) => e.preventDefault();
+
+    document.addEventListener("wheel", preventZoom, { passive: false });
+    document.addEventListener("gesturestart", preventGesture, { passive: false });
+    document.addEventListener("gesturechange", preventGesture, { passive: false });
+    document.addEventListener("gestureend", preventGesture, { passive: false });
+
+    return () => {
+      document.removeEventListener("wheel", preventZoom);
+      document.removeEventListener("gesturestart", preventGesture);
+      document.removeEventListener("gesturechange", preventGesture);
+      document.removeEventListener("gestureend", preventGesture);
+    };
+  }, []);
+
   const { hudVisible, buttonsVisible } = useAppStore();
   
   useDetectDeviceProfile();

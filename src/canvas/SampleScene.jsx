@@ -7,18 +7,37 @@ import { useAppStore } from '../store/useAppStore';
 
 function SceneContents() {
   const cubeRef = useRef();
-  const cameraGroupRef = useRef();
+  const cameraPivotRef = useRef();
   const updateCameraRotation = useAppStore((state) => state.updateCameraRotation);
+  const updateZoomLevel = useAppStore((state) => state.updateZoomLevel);
+  const zoomLevel = useAppStore((state) => state.zoomLevel);
+  const freeView = useAppStore((state) => state.freeView);
+  const prevMouse = useRef({ x: 0, y: 0 });
+  const { camera } = useThree();
 
   useFrame(() => {
     updateCameraRotation();
+    updateZoomLevel();
     const { cameraRotation } = useAppStore.getState();
 
-    if (cameraGroupRef.current) {
-      cameraGroupRef.current.rotation.x = cameraRotation.x;
-      cameraGroupRef.current.rotation.y = cameraRotation.y;
+    if (freeView) {
+      camera.rotation.x = cameraRotation.x;
+      camera.rotation.y = cameraRotation.y;
+    } else if (cameraPivotRef.current) {
+      cameraPivotRef.current.rotation.x = cameraRotation.x;
+      cameraPivotRef.current.rotation.y = cameraRotation.y;
     }
+
+    camera.position.z = zoomLevel;
   });
+
+  useEffect(() => {
+    const updateMouse = (e) => {
+      prevMouse.current = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener('mousemove', updateMouse);
+    return () => window.removeEventListener('mousemove', updateMouse);
+  }, []);
 
   return (
     <>
@@ -26,7 +45,11 @@ function SceneContents() {
       <KeyboardControls />
       <MouseControls />
 
-      <group ref={cameraGroupRef}>
+      <group ref={cameraPivotRef}>
+        <primitive object={camera} />
+      </group>
+
+      <group>
         <mesh ref={cubeRef} position={[0, 0.5, 0]}>
           <boxGeometry />
           <meshStandardMaterial color="lime" />
