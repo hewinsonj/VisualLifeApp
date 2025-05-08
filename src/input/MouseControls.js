@@ -12,6 +12,9 @@ function MouseControls() {
   const setCameraOffset = useAppStore((state) => state.setCameraOffset);
   const setFreeView = useAppStore((state) => state.setFreeView);
 
+  const cameraDistanceFromPivot = useAppStore((state) => state.cameraDistanceFromPivot);
+  const setCameraDistanceFromPivot = useAppStore((state) => state.setCameraDistanceFromPivot);
+
   const { camera } = useThree();
 
   const isDragging = useRef(false);
@@ -20,10 +23,12 @@ function MouseControls() {
 
   useEffect(() => {
     const handleWheel = (event) => {
+      event.preventDefault();
+      const currentZoom = useAppStore.getState().cameraDistanceFromPivot;
       if (event.deltaY > 0) {
-        setZoomTarget(Math.min(150, zoomTarget + 1.5));
+        setCameraDistanceFromPivot(Math.min(150, currentZoom + 1.5));
       } else {
-        setZoomTarget(Math.max(0.5, zoomTarget - 1.5));
+        setCameraDistanceFromPivot(Math.max(0.5, currentZoom - 1.5));
       }
     };
 
@@ -52,26 +57,33 @@ function MouseControls() {
       isDragging.current = false;
       dragButton.current = null;
 
-      if (useAppStore.getState().freeView) {
+      // Only sync state if we were in free view
+      const wasFreeView = useAppStore.getState().freeView;
+      if (wasFreeView) {
+        const pivotDistance = useAppStore.getState().cameraDistanceFromPivot;
+
+        // Improved calculation: use camera's world position and direction to find look target (pivot)
+        const worldPosition = new THREE.Vector3();
+        const worldDirection = new THREE.Vector3();
+        camera.getWorldPosition(worldPosition);
+        camera.getWorldDirection(worldDirection);
+
+        // Use controlled cameraDistanceFromPivot for pivot calculation to avoid drift
+        const lookTarget = new THREE.Vector3().copy(worldPosition).add(worldDirection.clone().normalize().multiplyScalar(cameraDistanceFromPivot));
+
         const worldQuat = camera.getWorldQuaternion(new THREE.Quaternion());
         const worldEuler = new THREE.Euler().setFromQuaternion(worldQuat);
-        const worldPos = camera.getWorldPosition(new THREE.Vector3());
 
         useAppStore.setState({
-          cameraRotation: {
-            x: worldEuler.x,
-            y: worldEuler.y,
-            z: worldEuler.z,
+          pivotPosition: {
+            x: lookTarget.x,
+            y: lookTarget.y,
+            z: lookTarget.z,
           },
           targetCameraRotation: {
             x: worldEuler.x,
             y: worldEuler.y,
             z: worldEuler.z,
-          },
-          pivotPosition: {
-            x: worldPos.x,
-            y: worldPos.y,
-            z: worldPos.z,
           },
         });
       }
@@ -140,7 +152,7 @@ function MouseControls() {
       dragButton.current = null;
     };
 
-    window.addEventListener('wheel', handleWheel);
+    window.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
     window.addEventListener('mousemove', handleMouseMove);
@@ -167,6 +179,8 @@ function MouseControls() {
     setCameraOffset,
     setFreeView,
     camera,
+    cameraDistanceFromPivot,
+    setCameraDistanceFromPivot,
   ]);
 
   return null;

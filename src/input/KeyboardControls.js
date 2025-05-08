@@ -60,7 +60,16 @@ export default function KeyboardControls() {
         case 't': incrementTightenRays(); break;
         case 'u': toggleChoppySpeed(); break;
         case 'm': toggleMirror(); break;
-        case '\\': resetZoomLevel(); break;
+        case '\\':
+          resetZoomLevel();
+          setZoomTarget(5);
+          useAppStore.setState((state) => ({
+            cameraDistanceFromPivot: 5,
+            cameraRotation: { x: 0, y: 0, z: 0 },
+            targetCameraRotation: { x: 0, y: 0, z: 0 },
+          }));
+          useAppStore.getState().resetPivotPosition();
+          break;
         // case 'd': toggleDebugger(); break;
         default: break;
       }

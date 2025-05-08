@@ -115,6 +115,8 @@ export const useAppStore = create((set) => ({
 
   zoomLevel: 30,
   zoomTarget: 30,
+  cameraDistanceFromPivot: 30,
+  setCameraDistanceFromPivot: (val) => set({ cameraDistanceFromPivot: val }),
   setZoomTarget: (val) => set({ zoomTarget: val }),
   updateZoomLevel: () =>
     set((state) => {
@@ -167,5 +169,17 @@ export const useAppStore = create((set) => ({
 
   // Pivot group position for camera transitions
   pivotPosition: { x: 0, y: 0, z: 0 },
-  setPivotPosition: (pos) => set({ pivotPosition: pos }),
+  initialPivotPosition: { x: 0, y: 0, z: 0 },
+
+  setPivotPosition: (pos) => {
+    // Prevent accidental reset if already matching target
+    if (pos && typeof pos === 'object' && 'x' in pos && 'y' in pos && 'z' in pos) {
+      set({ pivotPosition: pos });
+    }
+  },
+
+  resetPivotPosition: () => {
+    const { initialPivotPosition } = useAppStore.getState();
+    set({ pivotPosition: { ...initialPivotPosition } });
+  },
 }));

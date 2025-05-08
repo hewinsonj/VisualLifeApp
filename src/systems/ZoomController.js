@@ -1,14 +1,15 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useAppStore } from "../store/useAppStore";
 
-// ZoomController listens to global zoomLevel and applies it to the camera
+// ZoomController listens to global zoom state and applies it to the camera when not in free view
 export default function ZoomController() {
   const { camera } = useThree();
-  const zoomLevel = useAppStore((state) => state.zoomLevel);
+  const cameraDistanceFromPivot = useAppStore((state) => state.cameraDistanceFromPivot);
+  const freeView = useAppStore((state) => state.freeView);
 
   useFrame(() => {
-    if (camera && typeof zoomLevel === "number") {
-      camera.position.z = zoomLevel;
+    if (!freeView && camera && typeof cameraDistanceFromPivot === "number") {
+      camera.position.z = cameraDistanceFromPivot;
       camera.updateProjectionMatrix();
     }
   });

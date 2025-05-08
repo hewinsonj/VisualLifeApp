@@ -17,29 +17,52 @@ function SceneContents() {
   const { camera } = useThree();
   const [needsPivotSync, setNeedsPivotSync] = useState(false);
 
+  const justExitedFreeView = useRef(false);
+  const prevFreeView = useRef(false);
+
   useFrame(() => {
     updateCameraRotation();
     updateZoomLevel();
-    const { cameraRotation, freeView } = useAppStore.getState();
+    const state = useAppStore.getState();
+    const { cameraRotation, freeView, targetCameraRotation, pivotPosition, cameraDistanceFromPivot } = state;
+
+    // Track free view exit
+    if (prevFreeView.current && !freeView) {
+      justExitedFreeView.current = true;
+    }
+    prevFreeView.current = freeView;
 
     if (freeView) {
       camera.rotation.x = cameraRotation.x;
       camera.rotation.y = cameraRotation.y;
       camera.rotation.z = cameraRotation.z ?? 0;
     } else if (cameraPivotRef.current) {
-      const { cameraRotation, pivotPosition } = useAppStore.getState();
       cameraPivotRef.current.position.set(
         pivotPosition.x,
         pivotPosition.y,
         pivotPosition.z
       );
-      cameraPivotRef.current.rotation.x = cameraRotation.x;
-      cameraPivotRef.current.rotation.y = cameraRotation.y;
-      cameraPivotRef.current.rotation.z = cameraRotation.z ?? 0;
+
+      if (justExitedFreeView.current) {
+        cameraPivotRef.current.rotation.set(
+          targetCameraRotation.x,
+          targetCameraRotation.y,
+          targetCameraRotation.z ?? 0
+        );
+      } else {
+        cameraPivotRef.current.rotation.x = cameraRotation.x;
+        cameraPivotRef.current.rotation.y = cameraRotation.y;
+        cameraPivotRef.current.rotation.z = cameraRotation.z ?? 0;
+      }
+
       camera.rotation.set(0, 0, 0);
     }
 
-    camera.position.z = zoomLevel;
+    if (!freeView && !justExitedFreeView.current) {
+      camera.position.set(0, 0, cameraDistanceFromPivot);
+    }
+
+    justExitedFreeView.current = false;
   });
 
   useEffect(() => {
