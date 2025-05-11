@@ -106,6 +106,9 @@ export const useAppStore = create((set) => ({
   showHud: () => set({ hudVisible: true }),
   hideHud: () => set({ hudVisible: false }),
 
+  useCameraControls: false,
+  setUseCameraControls: (value) => set({ useCameraControls: value }),
+
   // Contrast level controls
   contrastLevel: 0,
   incrementContrast: () =>

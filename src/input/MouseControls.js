@@ -4,6 +4,7 @@ import { useAppStore } from '../store/useAppStore';
 import { useThree } from '@react-three/fiber';
 
 function MouseControls() {
+  if (useAppStore.getState().useCameraControls) return null;
   const setZoomTarget = useAppStore((state) => state.setZoomTarget);
   const zoomTarget = useAppStore((state) => state.zoomTarget);
   const targetCameraRotation = useAppStore((state) => state.targetCameraRotation);

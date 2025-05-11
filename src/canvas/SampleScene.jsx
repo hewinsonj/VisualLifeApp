@@ -5,6 +5,7 @@ import ZoomController from '../systems/ZoomController';
 import KeyboardControls from '../input/KeyboardControls';
 import MouseControls from '../input/MouseControls';
 import { useAppStore } from '../store/useAppStore';
+import CameraRig from './CameraRig';
 
 function SceneContents() {
   const cubeRef = useRef();
@@ -114,7 +115,9 @@ export default function SampleScene() {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <Canvas camera={{ position: [0, 0, 5], fov: 75 }} style={{ background: '#111' }}>
-        <SceneContents />
+        <CameraRig>
+          <SceneContents />
+        </CameraRig>
       </Canvas>
     </div>
   );

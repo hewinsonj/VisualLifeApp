@@ -52,6 +52,8 @@ export default function TogglePanel() {
     incrementCycle,
     toggleOutline,
     outlineEnabled,
+    useCameraControls,
+    setUseCameraControls,
   } = useAppStore();
 
   const [flashButton, setFlashButton] = React.useState(null);
@@ -107,6 +109,11 @@ export default function TogglePanel() {
   if (!shouldRender) return null;
 
   const buttonConfigs = [
+    {
+      label: "CamControl",
+      action: () => setUseCameraControls(!useCameraControls),
+      isActive: () => useCameraControls,
+    },
     {
       label: "View 1",
       action: () => setCameraMode("orbit"),
