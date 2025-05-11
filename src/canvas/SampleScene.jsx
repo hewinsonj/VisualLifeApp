@@ -1,68 +1,33 @@
+import React from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
 import ZoomController from '../systems/ZoomController';
 import KeyboardControls from '../input/KeyboardControls';
 import MouseControls from '../input/MouseControls';
+import CameraController from '../input/CameraController';
 import { useAppStore } from '../store/useAppStore';
+
 
 function SceneContents() {
   const cubeRef = useRef();
-  const cameraPivotRef = useRef();
-  const updateCameraRotation = useAppStore((state) => state.updateCameraRotation);
   const updateZoomLevel = useAppStore((state) => state.updateZoomLevel);
   const zoomLevel = useAppStore((state) => state.zoomLevel);
   const freeView = useAppStore((state) => state.freeView);
   const prevMouse = useRef({ x: 0, y: 0 });
   const { camera } = useThree();
-  const [needsPivotSync, setNeedsPivotSync] = useState(false);
 
-  const justExitedFreeView = useRef(false);
   const prevFreeView = useRef(false);
 
-  useFrame(() => {
-    updateCameraRotation();
+  useFrame((state, delta) => {
     updateZoomLevel();
-    const state = useAppStore.getState();
-    const { cameraRotation, freeView, targetCameraRotation, pivotPosition, cameraDistanceFromPivot } = state;
-
-    // Track free view exit
-    if (prevFreeView.current && !freeView) {
-      justExitedFreeView.current = true;
+    const controls = useAppStore.getState().cameraControls;
+    if (controls) {
+      controls.update(delta);
     }
+
+    const { freeView } = useAppStore.getState();
     prevFreeView.current = freeView;
-
-    if (freeView) {
-      camera.rotation.x = cameraRotation.x;
-      camera.rotation.y = cameraRotation.y;
-      camera.rotation.z = cameraRotation.z ?? 0;
-    } else if (cameraPivotRef.current) {
-      cameraPivotRef.current.position.set(
-        pivotPosition.x,
-        pivotPosition.y,
-        pivotPosition.z
-      );
-
-      if (justExitedFreeView.current) {
-        cameraPivotRef.current.rotation.set(
-          targetCameraRotation.x,
-          targetCameraRotation.y,
-          targetCameraRotation.z ?? 0
-        );
-      } else {
-        cameraPivotRef.current.rotation.x = cameraRotation.x;
-        cameraPivotRef.current.rotation.y = cameraRotation.y;
-        cameraPivotRef.current.rotation.z = cameraRotation.z ?? 0;
-      }
-
-      camera.rotation.set(0, 0, 0);
-    }
-
-    if (!freeView && !justExitedFreeView.current) {
-      camera.position.set(0, 0, cameraDistanceFromPivot);
-    }
-
-    justExitedFreeView.current = false;
   });
 
   useEffect(() => {
@@ -79,9 +44,7 @@ function SceneContents() {
       <KeyboardControls />
       <MouseControls />
 
-      <group ref={cameraPivotRef}>
-        <primitive object={camera} />
-      </group>
+      <primitive object={camera} />
 
       <group>
         <mesh ref={cubeRef} position={[0, 0.5, 0]}>
@@ -114,6 +77,7 @@ export default function SampleScene() {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <Canvas camera={{ position: [0, 0, 5], fov: 75 }} style={{ background: '#111' }}>
+        <CameraController />
         <SceneContents />
       </Canvas>
     </div>

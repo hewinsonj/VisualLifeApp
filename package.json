@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node --require ./src/vite-polyfill.cjs ./node_modules/vite/bin/vite.js",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -13,6 +13,7 @@
     "@react-three/drei": "9.56.14",
     "@react-three/fiber": "^8.13.0",
     "@react-three/postprocessing": "^2.19.1",
+    "camera-controls": "^2.4.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-spring": "^9.7.5",
@@ -21,6 +22,7 @@
     "zustand": "^5.0.4"
   },
   "devDependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@eslint/js": "^9.22.0",
     "@types/react": "^18.2.47",
     "@types/react-dom": "^18.2.17",
@@ -29,6 +31,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
-    "vite": "^6.3.1"
+    "vite": "^6.3.1",
+    "vite-plugin-node-polyfills": "^0.23.0"
   }
 }

@@ -418,11 +418,11 @@
   }
 .canvas,
 canvas {
-  touch-action: none !important;
+  pointer-events: auto;
+  touch-action: manipulation;
   -ms-touch-action: none;
   -webkit-user-select: none;
   user-select: none;
-  pointer-events: auto;
 }
 
 @keyframes fadeIn {
@@ -485,8 +485,9 @@ canvas {
 html, body, canvas {
   -webkit-user-select: none;
   user-select: none;
-  touch-action: none;
-  -ms-touch-action: none;
+  pointer-events: auto;
+  touch-action: manipulation; 
+   /* -ms-touch-action: none; */
   -webkit-touch-callout: none;
   overscroll-behavior: none;
 }

@@ -5,6 +5,8 @@ export const useAppStore = create((set) => ({
   glitchEnabled: false,
   cameraMode: "default",
 
+  setCameraRotation: (rotation) => set({ cameraRotation: rotation }),
+
   // HUD visibility toggle for glyphs, buttons, overlays
   hudVisible: true,
   toggleHud: () => set((state) => ({ hudVisible: !state.hudVisible })),
@@ -118,6 +120,10 @@ export const useAppStore = create((set) => ({
   cameraDistanceFromPivot: 30,
   setCameraDistanceFromPivot: (val) => set({ cameraDistanceFromPivot: val }),
   setZoomTarget: (val) => set({ zoomTarget: val }),
+
+  // Global camera-controls instance for external access
+  cameraControls: null,
+  setCameraControls: (ref) => set({ cameraControls: ref }),
   updateZoomLevel: () =>
     set((state) => {
       const lerp = (a, b, t) => a + (b - a) * t;
@@ -137,49 +143,13 @@ export const useAppStore = create((set) => ({
   setZoomLevel: (val) => set({ zoomLevel: val }),
   resetZoomLevel: () => set({
     zoomTarget: 1,
-    cameraRotation: { x: 0, y: 0, z: 0 },
-    targetCameraRotation: { x: 0, y: 0, z: 0 },
     cameraOffset: { x: 0, y: 0 },
   }),
 
   freeView: false,
   setFreeView: (val) => set({ freeView: val }),
 
-  cameraRotation: { x: 0, y: 0, z: 0 },
-  targetCameraRotation: { x: 0, y: 0, z: 0 },
-  setCameraRotation: (rotation) => set({ targetCameraRotation: rotation }),
-  updateCameraRotation: () =>
-    set((state) => {
-      const lerp = (start, end, factor) => start + (end - start) * factor;
-      const threshold = 0.00001;
-
-      const snap = (a, b) => Math.abs(a - b) < threshold ? b : lerp(a, b, 0.04);
-
-      return {
-        cameraRotation: {
-          x: snap(state.cameraRotation.x, state.targetCameraRotation.x),
-          y: snap(state.cameraRotation.y, state.targetCameraRotation.y),
-          z: snap(state.cameraRotation.z ?? 0, state.targetCameraRotation.z ?? 0),
-        },
-      };
-    }),
-
   cameraOffset: { x: 0, y: 0 },
   setCameraOffset: (offset) => set({ cameraOffset: offset }),
 
-  // Pivot group position for camera transitions
-  pivotPosition: { x: 0, y: 0, z: 0 },
-  initialPivotPosition: { x: 0, y: 0, z: 0 },
-
-  setPivotPosition: (pos) => {
-    // Prevent accidental reset if already matching target
-    if (pos && typeof pos === 'object' && 'x' in pos && 'y' in pos && 'z' in pos) {
-      set({ pivotPosition: pos });
-    }
-  },
-
-  resetPivotPosition: () => {
-    const { initialPivotPosition } = useAppStore.getState();
-    set({ pivotPosition: { ...initialPivotPosition } });
-  },
 }));
