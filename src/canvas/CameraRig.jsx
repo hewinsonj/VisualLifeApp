@@ -26,12 +26,6 @@ export default function CameraRig({ children }) {
   }, [useCameraControls]);
 
   useEffect(() => {
-    if (useCameraControls && cameraControlsRef.current) {
-      cameraControlsRef.current.connect(gl.domElement);
-    }
-  }, [useCameraControls, gl]);
-
-  useEffect(() => {
     if (!useCameraControls || !cameraControlsRef.current) return;
 
     const handleKeyDown = (e) => {
@@ -56,6 +50,23 @@ export default function CameraRig({ children }) {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [useCameraControls]);
+
+  useEffect(() => {
+    if (!cameraControlsRef.current) return;
+
+    if (!useCameraControls) {
+      const pos = cameraControlsRef.current.getPosition(new THREE.Vector3());
+      const tgt = cameraControlsRef.current.getTarget(new THREE.Vector3());
+      console.log("➡️ Exiting cam-controls to custom mode");
+      console.log("📍 Position:", pos.toArray());
+      console.log("🎯 Target:", tgt.toArray());
+    } else {
+      const { cameraPosition, pivotPosition } = useAppStore.getState();
+      console.log("↩️ Entering cam-controls mode with:");
+      console.log("📍 Position from store:", cameraPosition);
+      console.log("🎯 Pivot from store:", pivotPosition);
+    }
   }, [useCameraControls]);
 
   useFrame((state, delta) => {

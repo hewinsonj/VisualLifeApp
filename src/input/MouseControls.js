@@ -12,6 +12,7 @@ function MouseControls() {
   const cameraOffset = useAppStore((state) => state.cameraOffset);
   const setCameraOffset = useAppStore((state) => state.setCameraOffset);
   const setFreeView = useAppStore((state) => state.setFreeView);
+  const setCameraPosition = useAppStore((state) => state.setCameraPosition);
 
   const cameraDistanceFromPivot = useAppStore((state) => state.cameraDistanceFromPivot);
   const setCameraDistanceFromPivot = useAppStore((state) => state.setCameraDistanceFromPivot);
@@ -86,6 +87,12 @@ function MouseControls() {
             y: worldEuler.y,
             z: worldEuler.z,
           },
+        });
+
+        setCameraPosition({
+          x: worldPosition.x,
+          y: worldPosition.y,
+          z: worldPosition.z,
         });
       }
 
@@ -182,6 +189,7 @@ function MouseControls() {
     camera,
     cameraDistanceFromPivot,
     setCameraDistanceFromPivot,
+    setCameraPosition,
   ]);
 
   return null;

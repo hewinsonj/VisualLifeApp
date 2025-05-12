@@ -185,4 +185,11 @@ export const useAppStore = create((set) => ({
     const { initialPivotPosition } = useAppStore.getState();
     set({ pivotPosition: { ...initialPivotPosition } });
   },
+
+  cameraPosition: { x: 0, y: 0, z: 0 },
+  setCameraPosition: (pos) => {
+    if (pos && typeof pos === 'object' && 'x' in pos && 'y' in pos && 'z' in pos) {
+      set({ cameraPosition: pos });
+    }
+  },
 }));

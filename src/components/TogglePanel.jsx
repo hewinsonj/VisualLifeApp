@@ -111,7 +111,17 @@ export default function TogglePanel() {
   const buttonConfigs = [
     {
       label: "CamControl",
-      action: () => setUseCameraControls(!useCameraControls),
+      action: () => {
+        const { setCameraPosition, setPivotPosition } = useAppStore.getState();
+        const controls = document.querySelector("cameraControls")?.__r3f?.object;
+        if (controls && useCameraControls) {
+          const pos = controls.getPosition(new THREE.Vector3());
+          const tgt = controls.getTarget(new THREE.Vector3());
+          setCameraPosition({ x: pos.x, y: pos.y, z: pos.z });
+          setPivotPosition({ x: tgt.x, y: tgt.y, z: tgt.z });
+        }
+        setUseCameraControls(!useCameraControls);
+      },
       isActive: () => useCameraControls,
     },
     {
