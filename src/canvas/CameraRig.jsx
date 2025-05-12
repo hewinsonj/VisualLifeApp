@@ -14,10 +14,6 @@ export default function CameraRig({ children }) {
   const useCameraControls = useAppStore((s) => s.useCameraControls);
   const cameraControlsRef = useRef();
 
-  const isDragging = useRef(false);
-  const dragStart = useRef({ x: 0, y: 0 });
-  const dragButton = useRef(null);
-
   useEffect(() => {
     if (
       useCameraControls &&
@@ -30,43 +26,10 @@ export default function CameraRig({ children }) {
   }, [useCameraControls]);
 
   useEffect(() => {
-    if (!useCameraControls) return;
-
-    const handleMouseDown = (event) => {
-      if (event.shiftKey && event.button === 0) {
-        isDragging.current = true;
-        dragStart.current = { x: event.clientX, y: event.clientY };
-        dragButton.current = event.button;
-        // Removed call to setDragging
-      }
-    };
-
-    const handleMouseMove = (event) => {
-      if (!isDragging.current || dragButton.current !== 0) return;
-
-      const dx = event.clientX - dragStart.current.x;
-      const dy = event.clientY - dragStart.current.y;
-      dragStart.current = { x: event.clientX, y: event.clientY };
-
-      cameraControlsRef.current?.rotate(dx * -0.005, dy * -0.005, true);
-    };
-
-    const handleMouseUp = () => {
-      isDragging.current = false;
-      dragButton.current = null;
-      // Removed call to setDragging
-    };
-
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [useCameraControls]);
+    if (useCameraControls && cameraControlsRef.current) {
+      cameraControlsRef.current.connect(gl.domElement);
+    }
+  }, [useCameraControls, gl]);
 
   useEffect(() => {
     if (!useCameraControls || !cameraControlsRef.current) return;
@@ -114,8 +77,8 @@ export default function CameraRig({ children }) {
           dollySpeed={2.0}
           truckSpeed={2.0}
           dragToOrbit={true}
-          minPolarAngle={0}
-          maxPolarAngle={Math.PI}
+          minPolarAngle={-Infinity}
+          maxPolarAngle={Infinity}
           maxAzimuthAngle={Infinity}
           minAzimuthAngle={-Infinity}
           touches={{
