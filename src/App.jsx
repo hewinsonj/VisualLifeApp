@@ -42,7 +42,9 @@ function App() {
   return (
     <div>
       <div className="left-ui-column">
-        <div className="panel-wrapper"><TogglePanel /></div>
+        <div className="click-guard">
+          <div className="panel-wrapper"><TogglePanel /></div>
+        </div>
         <div className="logo-wrapper"><LogoToggleButton /></div>
         <div className="hud-wrapper"><HUDInfo /></div>
         <div className="logo-wrapperMobile"><LogoToggleButton /></div>
