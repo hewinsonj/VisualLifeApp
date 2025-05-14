@@ -208,4 +208,7 @@ export const useAppStore = create((set) => ({
       tiltAngle: state.tiltAngle + (state.targetTiltAngle - state.tiltAngle) * 0.08,
       yawAngle: state.yawAngle + (state.targetYawAngle - state.yawAngle) * 0.08,
     })),
+
+  topViewActive: false,
+  setTopViewActive: (val) => set({ topViewActive: val }),
 }));

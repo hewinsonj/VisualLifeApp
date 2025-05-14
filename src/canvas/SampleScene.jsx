@@ -21,6 +21,16 @@ function SceneContents() {
   const justExitedFreeView = useRef(false);
   const prevFreeView = useRef(false);
 
+  const cameraMode = useAppStore((state) => state.cameraMode);
+
+  // Force top view state immediately to avoid frame sync issues on refresh
+  if (cameraMode === 'top') {
+    useAppStore.setState({
+      topViewActive: true,
+      topYawVelocity: 0.002,
+    });
+  }
+
   useFrame(() => {
     updateCameraRotation();
     updateZoomLevel();
@@ -36,6 +46,7 @@ function SceneContents() {
       zoomLevel,
       tiltAngle,
       yawAngle,
+      topViewActive,
     } = state;
 
     if (cameraMode === 'zoom') {
@@ -69,13 +80,22 @@ function SceneContents() {
     }
 
     if (cameraMode === 'top') {
-      useAppStore.getState().updateTiltYawAngles();
-      const radius = 30;
-      const x = Math.cos(yawAngle) * Math.cos(tiltAngle) * radius;
-      const y = Math.sin(tiltAngle) * radius;
-      const z = Math.sin(yawAngle) * Math.cos(tiltAngle) * radius;
-      camera.position.set(x, y, z);
+      useAppStore.setState({ cameraDistanceFromPivot: 0 }); // Clear any inherited pivot distance
+      // useAppStore.getState().updateYawAngleWithVelocity(); // Commented out for debug
+      const elapsed = performance.now() * 0.001;
+
+      const orbitRadius = 30;
+      const angle = elapsed; // Simplified to use time directly for now
+      const x = Math.cos(angle) * orbitRadius;
+      const z = Math.sin(angle) * orbitRadius;
+      const y = 10; // Fixed vertical height for now
+
+      cameraPivotRef.current.position.set(x, y, z);
+      camera.position.set(0, 0, 0);
       camera.lookAt(0, 0, 0);
+
+      const spinAngle = elapsed * 0.15;
+      camera.rotation.z = spinAngle;
       return;
     }
 
@@ -147,15 +167,13 @@ function SceneContents() {
   }, []);
 
   // Trigger initial motion when views switch
-  const cameraMode = useAppStore((state) => state.cameraMode);
-
   useEffect(() => {
     if (cameraMode === 'zoom') {
       useAppStore.setState({ zoomVelocity: 0.2 });
     } else if (cameraMode === 'top') {
       useAppStore.setState({
-        targetTiltAngle: Math.PI / 6,
-        targetYawAngle: 0.5,
+        topViewActive: true,
+        topYawVelocity: 0.002,
       });
     }
   }, [cameraMode]);
