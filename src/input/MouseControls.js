@@ -25,6 +25,7 @@ function MouseControls() {
 
   useEffect(() => {
     const handleWheel = (event) => {
+      if (event.target.closest('.toggle-panel-scroll-wrapper')) return;
       event.preventDefault();
       const currentZoom = useAppStore.getState().cameraDistanceFromPivot;
       if (event.deltaY > 0) {
@@ -35,6 +36,7 @@ function MouseControls() {
     };
 
     const handleMouseDown = (event) => {
+      if (event.target.closest('.toggle-panel-scroll-wrapper')) return;
       isDragging.current = true;
       dragStart.current = { x: event.clientX, y: event.clientY };
       dragButton.current = event.button;
@@ -100,6 +102,7 @@ function MouseControls() {
     };
 
     const handleMouseMove = (event) => {
+      if (event.target.closest('.toggle-panel-scroll-wrapper')) return;
       if (!isDragging.current) return;
 
       const dx = event.clientX - dragStart.current.x;
@@ -127,6 +130,7 @@ function MouseControls() {
     };
 
     const handleTouchStart = (event) => {
+      if (event.target.closest('.toggle-panel-scroll-wrapper')) return;
       if (event.touches.length === 1) {
         isDragging.current = true;
         dragStart.current = {
@@ -138,6 +142,7 @@ function MouseControls() {
     };
 
     const handleTouchMove = (event) => {
+      if (event.target.closest('.toggle-panel-scroll-wrapper')) return;
       if (!isDragging.current || event.touches.length !== 1) return;
 
       const touch = event.touches[0];
@@ -168,6 +173,13 @@ function MouseControls() {
     window.addEventListener('touchstart', handleTouchStart);
     window.addEventListener('touchmove', handleTouchMove);
     window.addEventListener('touchend', handleTouchEnd);
+
+    window.addEventListener('mousedown', (e) => {
+      console.log('🖱️ Global mousedown on', e.target);
+    });
+    window.addEventListener('wheel', (e) => {
+      console.log('🛞 Global wheel on', e.target);
+    });
 
     return () => {
       window.removeEventListener('wheel', handleWheel);

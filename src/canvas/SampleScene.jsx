@@ -114,7 +114,12 @@ function SceneContents() {
 export default function SampleScene() {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
-      <Canvas camera={{ position: [0, 0, 5], fov: 75 }} style={{ background: '#111' }}>
+      <Canvas
+        camera={{ position: [0, 0, 5], fov: 75 }}
+        style={{ background: '#111' }}
+        onWheel={(e) => console.log('🎯 Canvas wheel', e.target)}
+        onMouseDown={(e) => console.log('🎯 Canvas mousedown', e.target)}
+      >
         <CameraRig>
           <SceneContents />
         </CameraRig>

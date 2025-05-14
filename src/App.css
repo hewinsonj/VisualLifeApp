@@ -36,7 +36,7 @@
   scrollbar-width: none;
   box-sizing: border-box;
   touch-action: pan-x;
-  background: rgba(0, 255, 0, 0.2); /* 🔧 TEMP: visible background for debug */
+  overscroll-behavior-x: contain;
 }
 
 .toggle-panel-scroll-wrapper::-webkit-scrollbar {
@@ -492,8 +492,9 @@ canvas {
 html, body, canvas {
   -webkit-user-select: none;
   user-select: none;
-  touch-action: none;
-  -ms-touch-action: none;
+  touch-action: auto;
+  -ms-touch-action: auto;
   -webkit-touch-callout: none;
-  overscroll-behavior: none;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: auto;
 }
