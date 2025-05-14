@@ -4,7 +4,11 @@ import { useAppStore } from '../store/useAppStore';
 import { useThree } from '@react-three/fiber';
 
 function MouseControls() {
-  if (useAppStore.getState().useCameraControls) return null;
+  const cameraMode = useAppStore.getState().cameraMode;
+  const useCameraControls = useAppStore.getState().useCameraControls;
+  if (useCameraControls || cameraMode === 'zoom') return null;
+
+  const camera = useThree((state) => state.camera);
   const setZoomTarget = useAppStore((state) => state.setZoomTarget);
   const zoomTarget = useAppStore((state) => state.zoomTarget);
   const targetCameraRotation = useAppStore((state) => state.targetCameraRotation);
@@ -13,11 +17,8 @@ function MouseControls() {
   const setCameraOffset = useAppStore((state) => state.setCameraOffset);
   const setFreeView = useAppStore((state) => state.setFreeView);
   const setCameraPosition = useAppStore((state) => state.setCameraPosition);
-
   const cameraDistanceFromPivot = useAppStore((state) => state.cameraDistanceFromPivot);
   const setCameraDistanceFromPivot = useAppStore((state) => state.setCameraDistanceFromPivot);
-
-  const { camera } = useThree();
 
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0 });

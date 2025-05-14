@@ -25,7 +25,59 @@ function SceneContents() {
     updateCameraRotation();
     updateZoomLevel();
     const state = useAppStore.getState();
-    const { cameraRotation, freeView, targetCameraRotation, pivotPosition, cameraDistanceFromPivot } = state;
+    const {
+      cameraRotation,
+      freeView,
+      targetCameraRotation,
+      pivotPosition,
+      cameraDistanceFromPivot,
+      cameraMode,
+      zoomVelocity,
+      zoomLevel,
+      tiltAngle,
+      yawAngle,
+    } = state;
+
+    if (cameraMode === 'zoom') {
+      const elapsed = performance.now() * 0.001; // faster rotation
+      const orbitSpeed = 0.6;
+      const zoomOscillation = Math.sin(elapsed * 1.6) * 1.2;
+      const verticalOscillation = Math.sin(elapsed * 2.0) * 0.5;
+
+      const baseZoom = zoomLevel + zoomVelocity;
+      const oscillatedZoom = baseZoom + zoomOscillation;
+
+      const angle = elapsed * orbitSpeed;
+      const x = Math.sin(angle) * oscillatedZoom;
+      const z = Math.cos(angle) * oscillatedZoom;
+      const y = verticalOscillation;
+
+      cameraPivotRef.current.position.set(x, y, z);
+
+      camera.position.set(0, 0, 0); // Neutralize local transform
+      camera.lookAt(0, 0, 0);
+
+      console.log('🔍 Zoom camera update', {
+        zoomVelocity,
+        newZoom: oscillatedZoom,
+        pivotZ: cameraPivotRef.current.position.z,
+        localCameraZ: camera.position.z,
+        worldCameraZ: camera.getWorldPosition(new THREE.Vector3()).z,
+      });
+
+      return;
+    }
+
+    if (cameraMode === 'top') {
+      useAppStore.getState().updateTiltYawAngles();
+      const radius = 30;
+      const x = Math.cos(yawAngle) * Math.cos(tiltAngle) * radius;
+      const y = Math.sin(tiltAngle) * radius;
+      const z = Math.sin(yawAngle) * Math.cos(tiltAngle) * radius;
+      camera.position.set(x, y, z);
+      camera.lookAt(0, 0, 0);
+      return;
+    }
 
     // Track free view exit
     if (prevFreeView.current && !freeView) {
@@ -59,7 +111,12 @@ function SceneContents() {
       camera.rotation.set(0, 0, 0);
     }
 
-    if (!freeView && !justExitedFreeView.current) {
+    if (
+      cameraMode !== 'zoom' &&
+      cameraMode !== 'top' &&
+      !freeView &&
+      !justExitedFreeView.current
+    ) {
       camera.position.set(0, 0, cameraDistanceFromPivot);
     }
 
@@ -73,6 +130,35 @@ function SceneContents() {
     window.addEventListener('mousemove', updateMouse);
     return () => window.removeEventListener('mousemove', updateMouse);
   }, []);
+
+  // Inject scroll-based zoomVelocity update for 'zoom' mode
+  useEffect(() => {
+    const onWheel = (e) => {
+      const { cameraMode } = useAppStore.getState();
+      if (cameraMode === 'zoom') {
+        e.preventDefault();
+        useAppStore.setState((state) => ({
+          zoomVelocity: state.zoomVelocity + e.deltaY * 0.002,
+        }));
+      }
+    };
+    window.addEventListener('wheel', onWheel, { passive: false });
+    return () => window.removeEventListener('wheel', onWheel);
+  }, []);
+
+  // Trigger initial motion when views switch
+  const cameraMode = useAppStore((state) => state.cameraMode);
+
+  useEffect(() => {
+    if (cameraMode === 'zoom') {
+      useAppStore.setState({ zoomVelocity: 0.2 });
+    } else if (cameraMode === 'top') {
+      useAppStore.setState({
+        targetTiltAngle: Math.PI / 6,
+        targetYawAngle: 0.5,
+      });
+    }
+  }, [cameraMode]);
 
   return (
     <>

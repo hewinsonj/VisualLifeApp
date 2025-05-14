@@ -70,12 +70,31 @@ export default function CameraRig({ children }) {
   }, [useCameraControls]);
 
   useFrame((state, delta) => {
+    const cameraMode = useAppStore.getState().cameraMode;
+    const {
+      zoomLevel,
+      zoomVelocity,
+      tiltAngle,
+      yawAngle,
+      updateTiltYawAngles,
+    } = useAppStore.getState();
+
     if (useCameraControls && cameraControlsRef.current) {
       cameraControlsRef.current.update(delta);
+    } else if (cameraMode === 'zoom') {
+      const newZoom = zoomLevel + zoomVelocity;
+      useAppStore.setState({ zoomLevel: newZoom, zoomVelocity: zoomVelocity * 0.9 });
+      state.camera.position.set(0, 0, newZoom);
+      state.camera.lookAt(0, 0, 0);
+    } else if (cameraMode === 'top') {
+      updateTiltYawAngles();
+      const r = 30;
+      const x = Math.cos(yawAngle) * Math.cos(tiltAngle) * r;
+      const y = Math.sin(tiltAngle) * r;
+      const z = Math.sin(yawAngle) * Math.cos(tiltAngle) * r;
+      state.camera.position.set(x, y, z);
+      state.camera.lookAt(0, 0, 0);
     }
-    // else {
-    //   camera.position.set(...) // removed fallback camera override logic
-    // }
   });
 
   return (

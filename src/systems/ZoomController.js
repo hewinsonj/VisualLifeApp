@@ -6,9 +6,10 @@ export default function ZoomController() {
   const { camera } = useThree();
   const cameraDistanceFromPivot = useAppStore((state) => state.cameraDistanceFromPivot);
   const freeView = useAppStore((state) => state.freeView);
+  const cameraMode = useAppStore((state) => state.cameraMode);
 
   useFrame(() => {
-    if (!freeView && camera && typeof cameraDistanceFromPivot === "number") {
+    if (cameraMode !== 'zoom' && !freeView && camera && typeof cameraDistanceFromPivot === "number") {
       camera.position.z = cameraDistanceFromPivot;
       camera.updateProjectionMatrix();
     }

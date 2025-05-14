@@ -110,7 +110,7 @@ export default function TogglePanel() {
 
   const buttonConfigs = [
     {
-      label: "CamControl",
+      label: "View 1",
       action: () => {
         const { setCameraPosition, setPivotPosition } = useAppStore.getState();
         const controls = document.querySelector("cameraControls")?.__r3f?.object;
@@ -120,22 +120,26 @@ export default function TogglePanel() {
           setCameraPosition({ x: pos.x, y: pos.y, z: pos.z });
           setPivotPosition({ x: tgt.x, y: tgt.y, z: tgt.z });
         }
-        setUseCameraControls(!useCameraControls);
+        setCameraMode("control");
+        setUseCameraControls(true);
       },
-      isActive: () => useCameraControls,
-    },
-    {
-      label: "View 1",
-      action: () => setCameraMode("orbit"),
-      isActive: () => cameraMode === "orbit",
+      isActive: () => cameraMode === "control",
     },
     {
       label: "View 2",
+      action: () => {
+        setCameraMode("default");
+        setUseCameraControls(false);
+      },
+      isActive: () => cameraMode === "default",
+    },
+    {
+      label: "View 3",
       action: () => setCameraMode("zoom"),
       isActive: () => cameraMode === "zoom",
     },
     {
-      label: "View 3",
+      label: "View 4",
       action: () => setCameraMode("top"),
       isActive: () => cameraMode === "top",
     },
@@ -187,13 +191,6 @@ export default function TogglePanel() {
       },
       flashKey: "zoomReset",
     },
-    // {
-    //   label: "Shader Zoom",
-    //   action: () => {
-    //     console.log("Shader Zoom not yet implemented.");
-    //   },
-    //   flashKey: "shaderZoom",
-    // },
     {
       label: "Glitch",
       action: () => setGlitch(!glitchEnabled),

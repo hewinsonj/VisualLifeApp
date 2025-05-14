@@ -3,7 +3,8 @@ import { create } from "zustand";
 export const useAppStore = create((set) => ({
   bloomEnabled: false,
   glitchEnabled: false,
-  cameraMode: "default",
+  cameraMode: "control",
+  useCameraControls: true,
 
   // HUD visibility toggle for glyphs, buttons, overlays
   hudVisible: true,
@@ -106,7 +107,6 @@ export const useAppStore = create((set) => ({
   showHud: () => set({ hudVisible: true }),
   hideHud: () => set({ hudVisible: false }),
 
-  useCameraControls: false,
   setUseCameraControls: (value) => set({ useCameraControls: value }),
 
   // Contrast level controls
@@ -192,4 +192,20 @@ export const useAppStore = create((set) => ({
       set({ cameraPosition: pos });
     }
   },
+
+  // New zoom and top camera view state values
+  zoomVelocity: 0,
+  setZoomVelocity: (val) => set({ zoomVelocity: val }),
+
+  tiltAngle: 0,
+  yawAngle: 0,
+  targetTiltAngle: 0,
+  targetYawAngle: 0,
+  setTargetTiltAngle: (val) => set({ targetTiltAngle: val }),
+  setTargetYawAngle: (val) => set({ targetYawAngle: val }),
+  updateTiltYawAngles: () =>
+    set((state) => ({
+      tiltAngle: state.tiltAngle + (state.targetTiltAngle - state.tiltAngle) * 0.08,
+      yawAngle: state.yawAngle + (state.targetYawAngle - state.yawAngle) * 0.08,
+    })),
 }));
