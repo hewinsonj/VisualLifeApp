@@ -67,50 +67,36 @@ const DebugPanel = () => {
 
   return (
     <div className="debug-panel">
-      <h4>🛠 Debug Panel</h4>
-      {/* <div>View Mode: <strong>{viewMode}</strong></div> */}
-      {/* <div>Zoom: <strong>{zoomLevel}</strong></div> */}
-      {/* <div>Device: <strong>{isMobile ? 'Mobile' : 'Desktop'}</strong></div> */}
-      <div>FPS: <strong>{fps}</strong></div>
-      {/* <hr /> */}
-      {/* <div>Shaders:</div> */}
-      {/* <div>‣ Bloom: <strong>{bloomEnabled ? 'On' : 'Off'}</strong></div> */}
-      {/* <div>‣ Glitch: <strong>{glitchEnabled ? 'On' : 'Off'}</strong></div> */}
-      {/* <div>‣ Godrays: <strong>{godrays ? 'On' : 'Off'}</strong></div> */}
-      {/* <div>‣ Distortion: <strong>{distortion ? 'On' : 'Off'}</strong></div> */}
-      {/* <div>‣ Ribbons: <strong>{ribbons ? 'On' : 'Off'}</strong></div> */}
-      <hr />
-      {/* <div><strong>Interaction Counters:</strong></div>
-      <div>Push: {pushCount}</div>
-      <div>Pull: {pullCount}</div>
-      <div>Scramble: {scrambleCount}</div>
-      <div>Spread Rays: {spreadRaysCount}</div>
-      <div>Tighten Rays: {tightenRaysCount}</div>
-      <div>Outline: {outlineCount}</div>
-      <div>Randomize Outlines: {randomizeOutlineCount}</div>
-      <div>Brightness Level: {brightnessLevel}</div>
-      <div>Contrast Level: {contrastLevel}</div>
-      <div>Debug HUD Visible: {debugHudVisible ? 'Yes' : 'No'}</div>
-      <hr /> */}
-      {/* <div><strong>Zustand Snapshot:</strong></div> */}
-      <pre>
-      <pre>
-  {JSON.stringify({
-    ...appState,
-    zoomLevel: appState.zoomLevel?.toFixed?.(2),
-    zoomTarget: appState.zoomTarget?.toFixed?.(2),
-    cameraRotation: {
-      x: appState.cameraRotation?.x?.toFixed?.(2),
-      y: appState.cameraRotation?.y?.toFixed?.(2),
-      z: appState.cameraRotation?.z?.toFixed?.(2),
-    },
-    targetCameraRotation: {
-      x: appState.targetCameraRotation?.x?.toFixed?.(2),
-      y: appState.targetCameraRotation?.y?.toFixed?.(2),
-      z: appState.targetCameraRotation?.z?.toFixed?.(2),
-    },
-  }, null, 2)}
-</pre>      </pre>
+      <button className="debug-scroll-btn up" onClick={() => {
+        const el = document.querySelector('.debug-panel-scrollable');
+        if (el) el.scrollBy({ top: -100, behavior: 'smooth' });
+      }}>↑</button>
+      <div className="debug-panel-scrollable">
+        <h4>🛠 Debug Panel</h4>
+        <div>FPS: <strong>{fps}</strong></div>
+        <hr />
+        <pre>
+          {JSON.stringify({
+            ...appState,
+            zoomLevel: appState.zoomLevel?.toFixed?.(2),
+            zoomTarget: appState.zoomTarget?.toFixed?.(2),
+            cameraRotation: {
+              x: appState.cameraRotation?.x?.toFixed?.(2),
+              y: appState.cameraRotation?.y?.toFixed?.(2),
+              z: appState.cameraRotation?.z?.toFixed?.(2),
+            },
+            targetCameraRotation: {
+              x: appState.targetCameraRotation?.x?.toFixed?.(2),
+              y: appState.targetCameraRotation?.y?.toFixed?.(2),
+              z: appState.targetCameraRotation?.z?.toFixed?.(2),
+            },
+          }, null, 2)}
+        </pre>
+      </div>
+      <button className="debug-scroll-btn down" onClick={() => {
+        const el = document.querySelector('.debug-panel-scrollable');
+        if (el) el.scrollBy({ top: 100, behavior: 'smooth' });
+      }}>↓</button>
     </div>
   );
 };

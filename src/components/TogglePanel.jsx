@@ -187,13 +187,13 @@ export default function TogglePanel() {
       },
       flashKey: "zoomReset",
     },
-    {
-      label: "Shader Zoom",
-      action: () => {
-        console.log("Shader Zoom not yet implemented.");
-      },
-      flashKey: "shaderZoom",
-    },
+    // {
+    //   label: "Shader Zoom",
+    //   action: () => {
+    //     console.log("Shader Zoom not yet implemented.");
+    //   },
+    //   flashKey: "shaderZoom",
+    // },
     {
       label: "Glitch",
       action: () => setGlitch(!glitchEnabled),
