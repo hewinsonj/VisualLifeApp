@@ -24,12 +24,14 @@ function SceneContents() {
   const cameraMode = useAppStore((state) => state.cameraMode);
 
   // Force top view state immediately to avoid frame sync issues on refresh
-  if (cameraMode === 'top') {
-    useAppStore.setState({
-      topViewActive: true,
-      topYawVelocity: 0.002,
-    });
-  }
+  useEffect(() => {
+    if (cameraMode === 'top') {
+      useAppStore.setState({
+        topViewActive: true,
+        topYawVelocity: 0.002,
+      });
+    }
+  }, [cameraMode]);
 
   useFrame(() => {
     updateCameraRotation();
@@ -68,34 +70,34 @@ function SceneContents() {
       camera.position.set(0, 0, 0); // Neutralize local transform
       camera.lookAt(0, 0, 0);
 
-      console.log('🔍 Zoom camera update', {
-        zoomVelocity,
-        newZoom: oscillatedZoom,
-        pivotZ: cameraPivotRef.current.position.z,
-        localCameraZ: camera.position.z,
-        worldCameraZ: camera.getWorldPosition(new THREE.Vector3()).z,
-      });
+      // console.log('🔍 Zoom camera update', {
+      //   zoomVelocity,
+      //   newZoom: oscillatedZoom,
+      //   pivotZ: cameraPivotRef.current.position.z,
+      //   localCameraZ: camera.position.z,
+      //   worldCameraZ: camera.getWorldPosition(new THREE.Vector3()).z,
+      // });
 
       return;
     }
 
     if (cameraMode === 'top') {
-      useAppStore.setState({ cameraDistanceFromPivot: 0 }); // Clear any inherited pivot distance
-      // useAppStore.getState().updateYawAngleWithVelocity(); // Commented out for debug
-      const elapsed = performance.now() * 0.001;
+      useAppStore.setState({
+        cameraDistanceFromPivot: 0,
+        tiltAngle: 0,
+        yawAngle: performance.now() * 0.001, // hot-patch to force non-zero angle
+      });
 
+      const elapsed = performance.now() * 0.001;
       const orbitRadius = 30;
-      const angle = elapsed; // Simplified to use time directly for now
-      const x = Math.cos(angle) * orbitRadius;
-      const z = Math.sin(angle) * orbitRadius;
-      const y = 10; // Fixed vertical height for now
+      const x = Math.cos(elapsed) * orbitRadius;
+      const z = Math.sin(elapsed) * orbitRadius;
+      const y = 10;
 
       cameraPivotRef.current.position.set(x, y, z);
       camera.position.set(0, 0, 0);
       camera.lookAt(0, 0, 0);
-
-      const spinAngle = elapsed * 0.15;
-      camera.rotation.z = spinAngle;
+      camera.rotation.z = elapsed * 0.15;
       return;
     }
 
@@ -221,8 +223,8 @@ export default function SampleScene() {
       <Canvas
         camera={{ position: [0, 0, 5], fov: 75 }}
         style={{ background: '#111' }}
-        onWheel={(e) => console.log('🎯 Canvas wheel', e.target)}
-        onMouseDown={(e) => console.log('🎯 Canvas mousedown', e.target)}
+        // onWheel={(e) => console.log('🎯 Canvas wheel', e.target)}
+        // onMouseDown={(e) => console.log('🎯 Canvas mousedown', e.target)}
       >
         <CameraRig>
           <SceneContents />

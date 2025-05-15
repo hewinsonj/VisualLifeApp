@@ -4,10 +4,7 @@ import { useAppStore } from '../store/useAppStore';
 import { useThree } from '@react-three/fiber';
 
 function MouseControls() {
-  const cameraMode = useAppStore.getState().cameraMode;
-  const useCameraControls = useAppStore.getState().useCameraControls;
-  if (useCameraControls || cameraMode === 'zoom') return null;
-
+  // Hooks first
   const camera = useThree((state) => state.camera);
   const setZoomTarget = useAppStore((state) => state.setZoomTarget);
   const zoomTarget = useAppStore((state) => state.zoomTarget);
@@ -26,6 +23,8 @@ function MouseControls() {
 
   useEffect(() => {
     const handleWheel = (event) => {
+      const { cameraMode } = useAppStore.getState();
+      if (cameraMode === 'top' || cameraMode === 'zoom') return;
       if (event.target.closest('.toggle-panel-scroll-wrapper')) return;
       event.preventDefault();
       const currentZoom = useAppStore.getState().cameraDistanceFromPivot;
@@ -37,6 +36,8 @@ function MouseControls() {
     };
 
     const handleMouseDown = (event) => {
+      const { cameraMode } = useAppStore.getState();
+      if (cameraMode === 'top' || cameraMode === 'zoom') return;
       if (event.target.closest('.toggle-panel-scroll-wrapper')) return;
       isDragging.current = true;
       dragStart.current = { x: event.clientX, y: event.clientY };
@@ -103,6 +104,8 @@ function MouseControls() {
     };
 
     const handleMouseMove = (event) => {
+      const { cameraMode } = useAppStore.getState();
+      if (cameraMode === 'top' || cameraMode === 'zoom') return;
       if (event.target.closest('.toggle-panel-scroll-wrapper')) return;
       if (!isDragging.current) return;
 
@@ -131,6 +134,8 @@ function MouseControls() {
     };
 
     const handleTouchStart = (event) => {
+      const { cameraMode } = useAppStore.getState();
+      if (cameraMode === 'top' || cameraMode === 'zoom') return;
       if (event.target.closest('.toggle-panel-scroll-wrapper')) return;
       if (event.touches.length === 1) {
         isDragging.current = true;
@@ -143,6 +148,8 @@ function MouseControls() {
     };
 
     const handleTouchMove = (event) => {
+      const { cameraMode } = useAppStore.getState();
+      if (cameraMode === 'top' || cameraMode === 'zoom') return;
       if (event.target.closest('.toggle-panel-scroll-wrapper')) return;
       if (!isDragging.current || event.touches.length !== 1) return;
 
@@ -175,12 +182,12 @@ function MouseControls() {
     window.addEventListener('touchmove', handleTouchMove);
     window.addEventListener('touchend', handleTouchEnd);
 
-    window.addEventListener('mousedown', (e) => {
-      console.log('🖱️ Global mousedown on', e.target);
-    });
-    window.addEventListener('wheel', (e) => {
-      console.log('🛞 Global wheel on', e.target);
-    });
+    // window.addEventListener('mousedown', (e) => {
+    //   console.log('🖱️ Global mousedown on', e.target);
+    // });
+    // window.addEventListener('wheel', (e) => {
+    //   console.log('🛞 Global wheel on', e.target);
+    // });
 
     return () => {
       window.removeEventListener('wheel', handleWheel);

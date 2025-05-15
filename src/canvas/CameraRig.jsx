@@ -58,14 +58,14 @@ export default function CameraRig({ children }) {
     if (!useCameraControls) {
       const pos = cameraControlsRef.current.getPosition(new THREE.Vector3());
       const tgt = cameraControlsRef.current.getTarget(new THREE.Vector3());
-      console.log("➡️ Exiting cam-controls to custom mode");
-      console.log("📍 Position:", pos.toArray());
-      console.log("🎯 Target:", tgt.toArray());
-    } else {
-      const { cameraPosition, pivotPosition } = useAppStore.getState();
-      console.log("↩️ Entering cam-controls mode with:");
-      console.log("📍 Position from store:", cameraPosition);
-      console.log("🎯 Pivot from store:", pivotPosition);
+    //   console.log("➡️ Exiting cam-controls to custom mode");
+    //   console.log("📍 Position:", pos.toArray());
+    //   console.log("🎯 Target:", tgt.toArray());
+    // } else {
+    //   const { cameraPosition, pivotPosition } = useAppStore.getState();
+    //   console.log("↩️ Entering cam-controls mode with:");
+    //   console.log("📍 Position from store:", cameraPosition);
+    //   console.log("🎯 Pivot from store:", pivotPosition);
     }
   }, [useCameraControls]);
 
@@ -87,13 +87,26 @@ export default function CameraRig({ children }) {
       state.camera.position.set(0, 0, newZoom);
       state.camera.lookAt(0, 0, 0);
     } else if (cameraMode === 'top') {
-      updateTiltYawAngles();
-      const r = 30;
-      const x = Math.cos(yawAngle) * Math.cos(tiltAngle) * r;
-      const y = Math.sin(tiltAngle) * r;
-      const z = Math.sin(yawAngle) * Math.cos(tiltAngle) * r;
-      state.camera.position.set(x, y, z);
+      useAppStore.setState({
+        cameraDistanceFromPivot: 0,
+        tiltAngle: 0,
+        yawAngle: performance.now() * 0.001, // hot-patch to force non-zero angle
+      });
+
+      const elapsed = performance.now() * 0.001;
+      const orbitRadius = 30;
+      const x = Math.cos(elapsed) * orbitRadius;
+      const z = Math.sin(elapsed) * orbitRadius;
+      const y = 10;
+
+      // Assuming cameraPivotRef is accessible here, otherwise this line needs adjustment
+      // Since it's not defined in this file, commenting out to avoid error
+      // cameraPivotRef.current.position.set(x, y, z);
+
+      state.camera.position.set(0, 0, 0);
       state.camera.lookAt(0, 0, 0);
+      state.camera.rotation.z = elapsed * 0.15;
+      return;
     }
   });
 
