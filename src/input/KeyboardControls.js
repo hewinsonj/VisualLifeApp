@@ -67,6 +67,10 @@ export default function KeyboardControls() {
             cameraDistanceFromPivot: 5,
             cameraRotation: { x: 0, y: 0, z: 0 },
             targetCameraRotation: { x: 0, y: 0, z: 0 },
+            yawAngle: 0,
+            tiltAngle: 0,
+            targetYawAngle: 0,
+            targetTiltAngle: 0,
           }));
           useAppStore.getState().resetPivotPosition();
           break;
@@ -95,3 +99,4 @@ export default function KeyboardControls() {
 
   return null;
 }
+

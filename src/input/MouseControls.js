@@ -105,6 +105,7 @@ function MouseControls() {
 
     const handleMouseMove = (event) => {
       const { cameraMode } = useAppStore.getState();
+      if (useAppStore.getState().timeScale === 0) return;
       if (cameraMode === 'top' || cameraMode === 'zoom') return;
       if (event.target.closest('.toggle-panel-scroll-wrapper')) return;
       if (!isDragging.current) return;
@@ -122,7 +123,7 @@ function MouseControls() {
           x: targetCameraRotation.x + dy * 0.02,
           y: targetCameraRotation.y + dx * 0.02,
         };
-        setCameraRotation(newRotation);
+        setCameraRotation({ x: newRotation.x, y: newRotation.y });
       } else if (dragButton.current === 2) {
         // Right button - pan
         const newOffset = {
@@ -149,6 +150,7 @@ function MouseControls() {
 
     const handleTouchMove = (event) => {
       const { cameraMode } = useAppStore.getState();
+      if (useAppStore.getState().timeScale === 0) return;
       if (cameraMode === 'top' || cameraMode === 'zoom') return;
       if (event.target.closest('.toggle-panel-scroll-wrapper')) return;
       if (!isDragging.current || event.touches.length !== 1) return;
@@ -165,7 +167,7 @@ function MouseControls() {
         x: targetCameraRotation.x + dy * 0.002,
         y: targetCameraRotation.y + dx * 0.002,
       };
-      setCameraRotation(newRotation);
+      setCameraRotation({ x: newRotation.x, y: newRotation.y });
     };
 
     const handleTouchEnd = () => {

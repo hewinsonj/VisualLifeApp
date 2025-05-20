@@ -13,6 +13,7 @@ export default function CameraRig({ children }) {
   const gl = useThree((state) => state.gl);
   const useCameraControls = useAppStore((s) => s.useCameraControls);
   const cameraControlsRef = useRef();
+  const topTimeRef = useRef(0);
 
   useEffect(() => {
     if (
@@ -87,13 +88,15 @@ export default function CameraRig({ children }) {
       state.camera.position.set(0, 0, newZoom);
       state.camera.lookAt(0, 0, 0);
     } else if (cameraMode === 'top') {
+      const { timeScale } = useAppStore.getState();
+      topTimeRef.current += delta * timeScale;
       useAppStore.setState({
         cameraDistanceFromPivot: 0,
         tiltAngle: 0,
-        yawAngle: performance.now() * 0.001, // hot-patch to force non-zero angle
+        yawAngle: topTimeRef.current,
       });
 
-      const elapsed = performance.now() * 0.001;
+      const elapsed = topTimeRef.current;
       const orbitRadius = 30;
       const x = Math.cos(elapsed) * orbitRadius;
       const z = Math.sin(elapsed) * orbitRadius;

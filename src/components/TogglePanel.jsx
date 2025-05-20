@@ -17,10 +17,10 @@ export default function TogglePanel() {
     setZoomLevel,
     resetZoomLevel,
     setCameraMode,
-    timeSpeed,
-    setTimeSpeed,
-    incrementTimeSpeed,
-    decrementTimeSpeed,
+    timeScale,
+    setTimeScale,
+    incrementTimeScale,
+    decrementTimeScale,
     fisheyeEnabled,
     wormholeEnabled,
     toggleFisheye,
@@ -61,6 +61,14 @@ export default function TogglePanel() {
     setFlashButton(name);
     setTimeout(() => setFlashButton(null), 300);
   };
+
+  // Store the last non-zero timeScale for pause/resume
+  const lastTimeScale = useRef(timeScale || 1);
+  useEffect(() => {
+    if (timeScale !== 0) {
+      lastTimeScale.current = timeScale;
+    }
+  }, [timeScale]);
 
   const scrollRef = useRef(null);
   const containerRef = useRef(null);
@@ -146,7 +154,9 @@ export default function TogglePanel() {
     {
       label: "Time +",
       action: () => {
-        incrementTimeSpeed();
+        // If paused, resume with increment
+        const next = Math.min(5.0, timeScale === 0 ? lastTimeScale.current + 0.05 : timeScale + 0.05);
+        setTimeScale(next);
         flash("timePlus");
       },
       flashKey: "timePlus",
@@ -154,7 +164,9 @@ export default function TogglePanel() {
     {
       label: "Time -",
       action: () => {
-        decrementTimeSpeed();
+        // If paused, resume with decrement
+        const next = Math.max(0.05, timeScale === 0 ? lastTimeScale.current - 0.05 : timeScale - 0.05);
+        setTimeScale(next);
         flash("timeMinus");
       },
       flashKey: "timeMinus",
@@ -162,10 +174,18 @@ export default function TogglePanel() {
     {
       label: "Time 1x",
       action: () => {
-        setTimeSpeed(1);
+        setTimeScale(1);
         flash("timeReset");
       },
       flashKey: "timeReset",
+    },
+    {
+      label: timeScale === 0 ? "Time Flow" : "Time Pause",
+      action: () => {
+        setTimeScale(timeScale === 0 ? lastTimeScale.current : 0);
+        flash("pauseTime");
+      },
+      flashKey: "pauseTime",
     },
     {
       label: "Zoom -",

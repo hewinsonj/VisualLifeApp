@@ -10,15 +10,16 @@ export const useAppStore = create((set) => ({
   hudVisible: true,
   toggleHud: () => set((state) => ({ hudVisible: !state.hudVisible })),
 
-  timeSpeed: 0.6,
-  setTimeSpeed: (val) => set({ timeSpeed: val }),
-  incrementTimeSpeed: () =>
+  // Global time dilation speed multiplier
+  timeScale: 1.0,
+  setTimeScale: (val) => set({ timeScale: val }),
+  incrementTimeScale: () =>
     set((state) => ({
-      timeSpeed: Math.min(5.0, state.timeSpeed + 0.05),
+      timeScale: Math.min(5.0, state.timeScale + 0.05),
     })),
-  decrementTimeSpeed: () =>
+  decrementTimeScale: () =>
     set((state) => ({
-      timeSpeed: Math.max(0.1, state.timeSpeed - 0.05),
+      timeScale: Math.max(0.05, state.timeScale - 0.05),
     })),
 
   fisheyeEnabled: false,
@@ -153,6 +154,8 @@ export const useAppStore = create((set) => ({
   setCameraRotation: (rotation) => set({ targetCameraRotation: rotation }),
   updateCameraRotation: () =>
     set((state) => {
+      if (state.timeScale === 0) return {};
+
       const lerp = (start, end, factor) => start + (end - start) * factor;
       const threshold = 0.00001;
 
@@ -204,10 +207,15 @@ export const useAppStore = create((set) => ({
   setTargetTiltAngle: (val) => set({ targetTiltAngle: val }),
   setTargetYawAngle: (val) => set({ targetYawAngle: val }),
   updateTiltYawAngles: () =>
-    set((state) => ({
-      tiltAngle: state.tiltAngle + (state.targetTiltAngle - state.tiltAngle) * 0.08,
-      yawAngle: state.yawAngle + (state.targetYawAngle - state.yawAngle) * 0.08,
-    })),
+    set((state) => {
+      if (state.timeScale === 0) return {};
+      const { tiltAngle, targetTiltAngle, yawAngle, targetYawAngle, timeScale } = state;
+      const lerpFactor = 0.08 * timeScale;
+      return {
+        tiltAngle: tiltAngle + (targetTiltAngle - tiltAngle) * lerpFactor,
+        yawAngle: yawAngle + (targetYawAngle - yawAngle) * lerpFactor,
+      };
+    }),
 
   topViewActive: false,
   setTopViewActive: (val) => set({ topViewActive: val }),
